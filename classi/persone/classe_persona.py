@@ -142,11 +142,10 @@ class ProfiloUtente(ABC):
             count -= 1
 
             if count == 0:
-                print(
-                    "se non si è in possesso di un profilo utente già registrato selezionare 2 per iscriversi al servizio")
+                print("se non si è in possesso di un profilo utente già registrato selezionare 2 per iscriversi al servizio")
                 print("digitare exit se si vuole terminare le operazioni")
                 verify = input()
-                return verify  # si riconduce al main dove fa la nuova iscrizione
+                pass  # si riconduce al main dove fa la nuova iscrizione
 
         if count > 0:
 
@@ -157,8 +156,7 @@ class ProfiloUtente(ABC):
             while pw != pw_check:
                 controllo -= 1
                 if controllo > 0:
-                    pw = check_se_vuoto(
-                        f" La password inserita  per questo username è incorretta, riprovare (tentetivi rimasti {controllo}): ")
+                    pw = check_se_vuoto(f" La password inserita  per questo username è incorretta, riprovare (tentetivi rimasti {controllo}): ")
 
                 elif controllo == 0:
                     print(f"La password inserita  per questo username è incorretta, tentativi rimasti {controllo}")

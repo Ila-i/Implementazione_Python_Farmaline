@@ -4,12 +4,13 @@ from db import connection
 ck_op: bool = False #ck abbreviazione per check
 ck_f : bool = False # controllo usato nella sezione del faramcista
 ck_m : bool = False # controllo usato nella sezione del medico
-operazione : str
+
 verifica : bool
 opzioni : str = "1"
 controllo : bool
 profilo : ProfiloUtente
 
+operazione : str # per registare la scelta dell'utente tra accedere e registrarsi
 
 print("HOME PAGE")
 print("Digitare 1 per accedere al servizio se si è in possesso di un profilo utente.")
@@ -18,7 +19,7 @@ operazione= input()
 
 # Operazioni con scelta di accesso al servizio
 while operazione == "1":
-    operazione = ProfiloUtente.accesso_utente() # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente ,
+    profilo = ProfiloUtente.accesso_utente() # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente ,
                                                 # 2 se ci si vuole registare ,
                                                 # exit per terminare le operazioni
     if operazione == "2" :
