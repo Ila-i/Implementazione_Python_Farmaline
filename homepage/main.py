@@ -1,14 +1,16 @@
+from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
 from classi.persone.classe_persona import ProfiloUtente, ProfiloCliente, ProfiloFarmacista, ProfiloMedico, Persona
 from db import connection
+from typing import Optional
 
 ck_op: bool = False #ck abbreviazione per check
 ck_f : bool = False # controllo usato nella sezione del faramcista
 ck_m : bool = False # controllo usato nella sezione del medico
 
-verifica : bool
+
 opzioni : str = "1"
 controllo : bool
-profilo : ProfiloUtente
+profilo : Optional[ProfiloUtente] #può assumere
 
 operazione : str # per registare la scelta dell'utente tra accedere e registrarsi
 
@@ -19,9 +21,13 @@ operazione= input()
 
 # Operazioni con scelta di accesso al servizio
 while operazione == "1":
-    profilo = ProfiloUtente.accesso_utente() # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente ,
-                                                # 2 se ci si vuole registare ,
-                                                # exit per terminare le operazioni
+
+    operazione = ProfiloUtente.accesso_utente() # ritorna : il nome utente quando l'operazione va a buon fine,
+                                                #           2 se ci si vuole registare
+                                                #           exit per terminare le operazioni
+
+    profilo = ProfiloUtente.get_profilo(operazione) # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente
+
     if operazione == "2" :
         if Persona.registrazione_utente() : # se è vero la registarzione è avvenuta correttamente , altrimenti vengono terminate le operazioni
             operazione = "1" #per poi procedere all'acesso
@@ -30,35 +36,37 @@ while operazione == "1":
 
 # Operazioni con scelta di registrazione al servizio
 while operazione == "2":
+    verifica: bool
     verifica = Persona.registrazione_utente()# se è vero la registarzione è avvenuta correttamente , altrimenti vengono terminate le operazioni
 
     if verifica:
-        operazione = ProfiloUtente.accesso_utente()  # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente ,
-                                       # 2 se ci si vuole registare ,
-                                       # exit per terminare le operazioni
+        operazione = ProfiloUtente.accesso_utente() # ritorna : il nome utente quando l'operazione va a buon fine,
+                                                    #           2 se ci si vuole registare
+                                                    #           exit per terminare le operazioni
+        profilo = ProfiloUtente.get_profilo(operazione)  # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente
     else:
         operazione = "exit"
 
 
-if isinstance( operazione , ProfiloUtente) : # dentro il servizio della farmacia
-
-    profilo = operazione
+if isinstance( profilo , ProfiloUtente) : # dentro il servizio della farmacia
 
     # sezione dedicata al cliente
     if  isinstance(profilo , ProfiloCliente):
 
-        while opzioni == "1":
-            profilo.search_bar()
-            print("Se si desidera continuare a ricercare medicinali da acquistare digitare 1")
-            print("Se si desidera terminare la ricerca e procedere all'acquisto digitare 2")
-            opzioni = input()
+        check_tessera = TesseraSanitaria.check_se_ancora_valida(profilo.id_utente) #controlla che la tessera sanitaria sia ancora in regola
+        if check_tessera is not None :
+            while opzioni == "1":
+                profilo.search_bar()
+                print("Se si desidera continuare a ricercare medicinali da acquistare digitare 1")
+                print("Se si desidera terminare la ricerca e procedere all'acquisto digitare 2")
+                opzioni = input()
 
-        if opzioni == "2":
-            print("PROCEDURA DI ACQUISTO")
-            profilo.scelta_indirizzi()
+            if opzioni == "2":
+                print("PROCEDURA DI ACQUISTO")
+                profilo.scelta_indirizzi()
 
-        else:
-            print("operazione non disponibile")
+            else:
+                print("operazione non disponibile")
 
     # sezione dedicata al farmacista
     elif isinstance(profilo , ProfiloFarmacista) :

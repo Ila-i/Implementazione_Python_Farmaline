@@ -36,9 +36,9 @@ def check_nascita(data:datetime.date)-> datetime.date:
 
     return today
 
-#per il controllo delle date di nascita, verifica che siano già passate
+#per il controllo delle date di scadenza, verifica che non siano già passate
 # restituisce true quando può continuare , e false quando deve cessare le operazioni
-def check_date(data: datetime.date) -> bool:
+def check_scadenza(data: datetime.date) -> bool:
 
     today = date.today()  # funzione di Python che restituisce la data odierna
 

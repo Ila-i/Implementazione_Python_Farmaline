@@ -1,4 +1,4 @@
-from funzioni_generali.controlli_function import check_date, check_se_vuoto, controlla, check_nascita
+from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla, check_nascita
 from classi.documenti.classe_tesserino_professionale import TesserinoProfessionale
 from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
 from funzioni_generali.random_function import create_random_string
@@ -95,37 +95,35 @@ class ProfiloUtente(ABC):
         tipo_prof = str(profile.iloc[0, 1])
 
         if tipo_prof == "cliente":
+
             query = f"SELECT id_cliente FROM ProfiloUtente WHERE nome_utente = '{username}'"
             id_c = pd.read_sql_query(query, connection)
             id_c = str(id_c.iloc[0, 0])
-
-            profilo = ProfiloCliente(username, pw, id_c, tipo_prof)
+            return ProfiloCliente(username, pw, id_c, tipo_prof)
 
         elif tipo_prof == "farmacista":
+
             query = f"SELECT id_sanitari FROM ProfiloUtente WHERE nome_utente = '{username}'"
             id_f = pd.read_sql_query(query, connection)
             id_f = str(id_f.iloc[0, 0])
-            profilo = ProfiloFarmacista(username, pw, id_f, tipo_prof)
+            return ProfiloFarmacista(username, pw, id_f, tipo_prof)
 
         elif tipo_prof == "medico":
+
             query = f"SELECT id_sanitari FROM ProfiloUtente WHERE nome_utente = '{username}'"
             id_m = pd.read_sql_query(query, connection)
             id_m = str(id_m.iloc[0, 0])
-            profilo = ProfiloMedico(username, pw, id_m, tipo_prof)
+            return ProfiloMedico(username, pw, id_m, tipo_prof)
+
         else:
             print("Operazione fallita")
-
-        return profilo
+            pass
 
     @staticmethod
-    def accesso_utente() -> "ProfiloUtente | str" :
+    def accesso_utente() -> "str" :
 
         username: str
-        prof: ProfiloUtente
-        verifica: str
-        pw: str  # pw abbrevviazione per password
-        count: int = 3
-        controllo: int= 3
+        tentativi: int = 3
 
         print("INSERIMENTO DATI PER ACCESSO")
 
@@ -135,74 +133,40 @@ class ProfiloUtente(ABC):
         profile_check = pd.read_sql(query, connection)
 
         while profile_check.empty:
-            username = check_se_vuoto(
-                f" Il nome utente inserito non appartiente a un utente registarto, riprovare (tentativi rimasti {count}): ")
+
+            username = check_se_vuoto(f" Il nome utente inserito non appartiente a un utente registarto, riprovare (tentativi rimasti {tentativi}): ")
             query = f"SELECT nome_utente, password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
             profile_check = pd.read_sql(query, connection)
-            count -= 1
+            tentativi -= 1
 
-            if count == 0:
+            if tentativi == 0:
+
+                op: str  # abbreviazione per operazione
                 print("se non si è in possesso di un profilo utente già registrato selezionare 2 per iscriversi al servizio")
                 print("digitare exit se si vuole terminare le operazioni")
-                verify = input()
-                pass  # si riconduce al main dove fa la nuova iscrizione
+                op = input()
+                return op
 
-        if count > 0:
+        # sezione dedicata al controllo password, si esegue questa sezione quando viene trovato il nome utente nel database
+        if tentativi > 0:
 
-            # sezione dedicata al controllo password
+            pw: str  # pw abbrevviazione per password
+            tentativi = 3
+
             pw = check_se_vuoto("Inserire la propria password : ")
             pw_check = str(profile_check.iloc[0, 1])
 
             while pw != pw_check:
-                controllo -= 1
-                if controllo > 0:
-                    pw = check_se_vuoto(f" La password inserita  per questo username è incorretta, riprovare (tentetivi rimasti {controllo}): ")
+                tentativi -= 1
+                if tentativi > 0:
+                    pw = check_se_vuoto(f" La password inserita  per questo username è incorretta, riprovare (tentetivi rimasti {tentativi}): ")
 
-                elif controllo == 0:
-                    print(f"La password inserita  per questo username è incorretta, tentativi rimasti {controllo}")
+                elif tentativi == 0:
+                    print(f"La password inserita  per questo username è incorretta, tentativi rimasti {tentativi}")
                     print(f"Operazione fallita")
                     return "exit"
 
-            if pw_check == pw:
-
-                prof = ProfiloUtente.get_profilo(username)
-
-                #sezione che nel caso di profilo cliente controlla che la tessera sanitaria sia in regola
-                if isinstance(prof, ProfiloCliente):
-
-                    query = f"SELECT data_scadenza FROM TesseraSanitaria WHERE codice_Fiscale= '{prof.id_utente}'"
-                    data = pd.read_sql_query(query, connection)
-                    data_ck = data.iloc[0, 0]
-                    data_ck = datetime.strptime(data_ck, "%Y-%m-%d").date()
-                    data_ck = check_date(data_ck)
-                    if not data_ck:
-                        print(
-                            "La tessera sanitaria risulta scaduta. Vuoi aggiornare la data di scadenza ? Digitare si o no")
-                        verifica = input()
-                        if verifica == "si":
-                            ck = False
-                            while not ck:
-                                data_input = controlla("NUOVA DATA DI SCADENZA (gg/mm/aaaa) : ", 10)
-                                try:
-                                    new_date = datetime.strptime(data_input, "%d/%m/%Y").date()
-                                    ck = True
-                                except ValueError:
-                                    print("Data non valida!")
-                                    ck = False
-
-                            query = f"UPDATE TesseraSanitaria SET data_scadenza= '{new_date}' WHERE codice_Fiscale= '{prof.id_utente}'"
-                            connection.executed(text(query))
-                            connection.commit()
-                        elif verifica == "no":
-                            print("Il profilo verrà eliminato")
-                            query = f"DELETE FROM TesseraSanitaria WHERE codice_Fiscale='{prof.id_utente}'"
-                            connection.execute(text(query))
-                            connection.commit()
-                            return "exit"
-                        else:
-                            print("operazione non valida")
-                            return "exit"
-        return prof
+        return username
 
 
 class ProfilolavoratoreSanitario(ProfiloUtente) :
@@ -419,7 +383,7 @@ class ProfiloCliente(ProfiloUtente) :
                 print(f"DATA SCADENZA : {data_scadenza}")
                 print(f"CVC : {cvc}")
 
-                ck_data = check_date(data_scadenza)
+                ck_data = check_scadenza(data_scadenza)
 
                 if not ck_data:
                     print("operazione fallita")#carta scaduta
@@ -799,7 +763,7 @@ class Cliente(Persona):
         ck_data: bool
 
         self.t_s.data_nascita = check_nascita(self.t_s.data_nascita)# per verificare che la data di nascita non indichi una data futura
-        ck_data= check_date(self.t_s.data_scadenza)# per verificare che la tessera registrata non sia scaduta
+        ck_data= check_scadenza(self.t_s.data_scadenza)# per verificare che la tessera registrata non sia scaduta
 
 
         if ck_data and self.t_s.data_nascita != date.today()  :

@@ -1,5 +1,7 @@
-from funzioni_generali.controlli_function import controlla, check_se_vuoto
-from datetime import datetime
+from sqlalchemy import text
+
+from funzioni_generali.controlli_function import controlla, check_se_vuoto, check_scadenza
+from datetime import datetime, date
 from db import connection
 import pandas as pd
 
@@ -66,3 +68,54 @@ class TesseraSanitaria :
         )
         new_tessera.to_sql('TesseraSanitaria', connection, if_exists='append', index=False)
         connection.commit()
+
+    @classmethod
+    def check_se_ancora_valida(cls, codice_f: str )->None:
+
+        new_date : datetime.date = date.today()
+        query = f"SELECT data_scadenza FROM TesseraSanitaria WHERE codice_Fiscale= '{codice_f}'"
+        data = pd.read_sql_query(query, connection)
+        data_ck = data.iloc[0, 0]
+        data_ck = datetime.strptime(data_ck, "%Y-%m-%d").date()
+        data_ck = check_scadenza(data_ck)
+
+        while not data_ck:
+
+            print("La tessera sanitaria risulta scaduta. Vuoi aggiornare la data di scadenza ? Digitare si o no")
+            verifica = input()
+
+            if verifica == "si":
+
+                ck : bool = False
+
+                while not ck:
+                    data_input = controlla("NUOVA DATA DI SCADENZA (gg/mm/aaaa) : ", 10)
+                    try:
+                        new_date = datetime.strptime(data_input, "%d/%m/%Y").date()
+                        ck = True
+                    except ValueError:
+                        print("Data non valida!")
+                        ck = False
+
+                query = f"UPDATE TesseraSanitaria SET data_scadenza= '{new_date}' WHERE codice_Fiscale= '{codice_f}'"
+                connection.execute(text(query))
+                connection.commit()
+
+            elif verifica == "no":
+
+                print("Il profilo verrà eliminato")
+                query = f"DELETE FROM TesseraSanitaria WHERE codice_Fiscale ='{codice_f}'"
+                connection.execute(text(query))
+                connection.commit()
+                query = f"DELETE FROM ProfiloUtente WHERE id_cliente = '{codice_f}'"
+                connection.execute(text(query))
+                connection.commit()
+                query = f"DELETE FROM Clienti WHERE  codice_fiscale = '{codice_f}'"
+                connection.execute(text(query))
+                connection.commit()
+                return None
+
+            else:
+                print("operazione non valida")
+
+            data_ck = check_scadenza(new_date)
