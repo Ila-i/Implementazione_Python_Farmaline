@@ -118,20 +118,18 @@ class ProfiloUtente(ABC):
         return profilo
 
     @staticmethod
-    def accesso_utente() -> "ProfiloUtente | str":
+    def accesso_utente() -> "ProfiloUtente | str" :
 
         username: str
         prof: ProfiloUtente
         verifica: str
         pw: str  # pw abbrevviazione per password
-        count: int
-        controllo: int
-        count = 3
-        controllo = 3  # il termice chek viene utilizzato per riferire le variabili di controllo usate per verificare la presenza dell'utente
+        count: int = 3
+        controllo: int= 3
 
         print("INSERIMENTO DATI PER ACCESSO")
 
-        # sezione dedicata al controllo del nome utente
+        # sezione dedicata al controllo del nome utente, si verifica se è presente nel database
         username = check_se_vuoto("Inserire il proprio nome utente : ")
         query = f"SELECT nome_utente, password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
         profile_check = pd.read_sql(query, connection)

@@ -1,9 +1,9 @@
 from classi.persone.classe_persona import ProfiloUtente, ProfiloCliente, ProfiloFarmacista, ProfiloMedico, Persona
 from db import connection
 
-ck_op: bool = False
-ck_f : bool = False
-ck_m : bool = False
+ck_op: bool = False #ck abbreviazione per check
+ck_f : bool = False # controllo usato nella sezione del faramcista
+ck_m : bool = False # controllo usato nella sezione del medico
 operazione : str
 verifica : bool
 opzioni : str = "1"
@@ -11,19 +11,16 @@ controllo : bool
 profilo : ProfiloUtente
 
 
-# modifica accesso con il controllo password e i due return exit e continua
-#prova
-
 print("HOME PAGE")
-print("Se si è in possesso di un profilo utente digitare 1 per accedere al servizio.")
-print("Se non si possiede un profilo utente digitare 2 per registrarsi al servizio.")
+print("Digitare 1 per accedere al servizio se si è in possesso di un profilo utente.")
+print("Digitare 2 per registrarsi al servizio se non si possiede un profilo utente .")
 operazione= input()
 
 # Operazioni con scelta di accesso al servizio
 while operazione == "1":
-    operazione= ProfiloUtente.accesso_utente()  # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente ,
-                                   # 2 se ci si vuole registare ,
-                                   # exit per terminare le operazioni
+    operazione = ProfiloUtente.accesso_utente() # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente ,
+                                                # 2 se ci si vuole registare ,
+                                                # exit per terminare le operazioni
     if operazione == "2" :
         if Persona.registrazione_utente() : # se è vero la registarzione è avvenuta correttamente , altrimenti vengono terminate le operazioni
             operazione = "1" #per poi procedere all'acesso
