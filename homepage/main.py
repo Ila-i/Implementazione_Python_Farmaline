@@ -12,7 +12,7 @@ profilo : ProfiloUtente
 
 
 # modifica accesso con il controllo password e i due return exit e continua
-#prova se ca
+#prova
 
 print("HOME PAGE")
 print("Se si è in possesso di un profilo utente digitare 1 per accedere al servizio.")
