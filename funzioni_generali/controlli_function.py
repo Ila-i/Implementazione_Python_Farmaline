@@ -4,7 +4,7 @@ from datetime import date
 
 #per il controllo di lunghezza stringa
 #retituisce il parametro corretto
-def controlla(messaggio: str, lunghezza: int) -> str :
+def controlla_lunghezza(messaggio: str, lunghezza: int) -> str :
 
    parametro = input(messaggio)
 

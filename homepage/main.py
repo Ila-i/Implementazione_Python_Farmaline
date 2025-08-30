@@ -1,14 +1,9 @@
-from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
 from classi.persone.classe_persona import ProfiloUtente, ProfiloCliente, ProfiloFarmacista, ProfiloMedico, Persona
-from db import connection
+from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
 from typing import Optional
+from db import connection
 
-ck_op: bool = False #ck abbreviazione per check
-ck_f : bool = False # controllo usato nella sezione del faramcista
-ck_m : bool = False # controllo usato nella sezione del medico
-
-profilo : Optional[ProfiloUtente] #può assumere valore priflo utente o None
-
+profilo : Optional[ProfiloUtente] #può appartenere alla classe ProfiloUtente o assumere valore None
 operazione : str # per registare la scelta dell'utente tra accedere e registrarsi
 
 print("HOME PAGE")
@@ -20,12 +15,11 @@ operazione= input()
 while operazione == "1":
 
     operazione = ProfiloUtente.accesso_utente()
-
     profilo = ProfiloUtente.get_profilo(operazione)
 
     if operazione == "2" :
         if Persona.registrazione_utente() :
-            operazione = "1" #per poi procedere all'acesso
+            operazione = "1"
         else :
             operazione = "exit"
 
@@ -41,23 +35,25 @@ while operazione == "2":
         operazione = "exit"
 
 
-if isinstance( profilo , ProfiloUtente) : # dentro il servizio della farmacia
+if isinstance( profilo , ProfiloUtente) :
+    #sezione eseguibile solo dopo aver effettuato l'accesso al servizio
 
-    opzioni: str = "1"
 
     # sezione dedicata al cliente
     if  isinstance(profilo , ProfiloCliente):
 
+        opzioni_c: str = "1"
+
         check_tessera = TesseraSanitaria.check_se_ancora_valida(profilo.id_utente)
 
         if check_tessera is not None :
-            while opzioni == "1":
+            while opzioni_c == "1":
                 profilo.search_bar()
                 print("Se si desidera continuare a ricercare medicinali da acquistare digitare 1")
                 print("Se si desidera terminare la ricerca e procedere all'acquisto digitare 2")
-                opzioni = input()
+                opzioni_c = input()
 
-            if opzioni == "2":
+            if opzioni_c == "2":
                 print("PROCEDURA DI ACQUISTO")
                 profilo.scelta_indirizzi()
 
@@ -67,30 +63,36 @@ if isinstance( profilo , ProfiloUtente) : # dentro il servizio della farmacia
     # sezione dedicata al farmacista
     elif isinstance(profilo , ProfiloFarmacista) :
 
+        opzioni_f: str = "1"
+        ck_f: bool = False # abbreviazione per check_farmacista
+
         while not ck_f :
+
+            ck_op: bool = False  # abbreviazione per check_opzioni
+
             print("Se si desidera aggiornare il magazzino digitare 1")
             print("Per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna digitare 2")
             print("Per terminare le operazioni digitare exit.")
-            opzioni = input()
+            opzioni_f = input()
 
-            if opzioni == "1":
+            if opzioni_f == "1":
                 profilo.aggiorna_magazzino()
                 print("Se si desidera aggiungere nuovi farmaci al magazzino digitare 1")
                 print("Per terminare le operazioni digitare exit.")
-                opzioni = input()
+                opzioni_f = input()
 
-                if opzioni == "2":
+                if opzioni_f == "2":
                     ck_op = True
 
-            while opzioni == "1":
+            while opzioni_f == "1":
                 print("PROCEDURA DI AGGIUNTA FARMACI")
                 profilo.aggiunta_farmaci()
                 print("Se si desidera continuare a aggiungere nuovi farmaci al magazzino digitare 1")
                 print("Per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna digitare 2")
                 print("Per terminare le operazioni digitare exit.")
-                opzioni = input()
+                opzioni_f = input()
 
-            while opzioni == "2" and not ck_op:
+            while opzioni_f == "2" and not ck_op:
                 print("PROCEDURA DI VERIFICA")
                 profilo.verifica_ordine()
                 print("Se si desidera aggiungere nuovi farmaci al magazzino digitare 1")
@@ -98,7 +100,7 @@ if isinstance( profilo , ProfiloUtente) : # dentro il servizio della farmacia
                 print("Per terminare le operazioni digitare exit.")
                 opzioni = input()
 
-            if opzioni == "exit" :
+            if opzioni_f == "exit" :
                 ck_f = True
             else:
                 print("operazione inesistente")
@@ -107,19 +109,22 @@ if isinstance( profilo , ProfiloUtente) : # dentro il servizio della farmacia
     #sezione dedicata al medico
     elif isinstance(profilo , ProfiloMedico):
 
+        opzioni_m: str = "1"
+        ck_m: bool = False #ck abbreviazione per check_medico
+
         while not ck_m :
             print("Se si desidera prescivere una ricetta medica digitare 1")
             print("Se si desidera terminare le operazioni digitare exit")
-            opzioni = input()
+            opzioni_m = input()
 
-            while opzioni == "1" :
+            while opzioni_m == "1" :
                 print("PROCEDURA DI PRESCRIZIONE RICETTA MEDICA")
                 profilo.crea_ricetta()
                 print("Se si desidera prescivere un'altra ricetta medica digitare 1")
                 print("Se si desidera terminare le operazioni digitare exit")
-                opzioni = input()
+                opzioni_m = input()
 
-            if opzioni == "exit" :
+            if opzioni_m == "exit" :
                 ck_m = True
             else :
                 print("operazione inesistente")

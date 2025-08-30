@@ -1,10 +1,8 @@
-from sqlalchemy import text
-
-from funzioni_generali.controlli_function import controlla, check_se_vuoto, check_scadenza
+from funzioni_generali.controlli_function import controlla_lunghezza, check_se_vuoto, check_scadenza
 from datetime import datetime, date
+from sqlalchemy import text
 from db import connection
 import pandas as pd
-
 
 class TesseraSanitaria :
 
@@ -18,34 +16,36 @@ class TesseraSanitaria :
 
     def __init__(self):
 
-        ck: bool =False
+        ck_d: bool =False # abbreviazione per check_data
+
         print( " Di seguito si inseriscano i dati della tessera sanitaria : ")
-        self.codice_fiscale = controlla(" CODICE FISCALE :", 16) # nel codice fiscale si contano 16 caratteri alfanumerici
-        self.sesso = controlla(" SESSO : ", 1)
+        self.codice_fiscale = controlla_lunghezza(" CODICE FISCALE( es. RSSMRA00A01H501C ):", 16) # nel codice fiscale si contano 16 caratteri alfanumerici
+        self.sesso = controlla_lunghezza(" SESSO (es. X): ", 1)
         self.luogo_nascita = check_se_vuoto(" LUOGO DI NASCITA : ")
-        self.provincia = controlla(" PROVINCIA : ", 2)
+        self.provincia = controlla_lunghezza(" PROVINCIA ( es. RM): ", 2)
         #controllo che la data di nascita sia inserita correttamente
-        while not ck:
-            data_input = controlla(" DATA DI NASCITA (gg/mm/aaaa) : ", 10)
+        while not ck_d:
+            data_input = controlla_lunghezza(" DATA DI NASCITA (es. gg/mm/aaaa) : ", 10)
             try:
                 self.data_nascita = datetime.strptime(data_input, "%d/%m/%Y").date()
-                ck=True
+                ck_d=True
             except ValueError:
                 print("Data non valida!")
-                ck=False
+                ck_d=False
         #controllo che la data di scadenza sia inserita correttamente
-        ck= False
-        while not ck:
-            data_input = controlla(" DATA DI SCADENZA (gg/mm/aaaa) : ", 10)
+        ck_d= False
+        while not ck_d:
+            data_input = controlla_lunghezza(" DATA DI SCADENZA (es. gg/mm/aaaa) : ", 10)
             try:
                 self.data_scadenza = datetime.strptime(data_input, "%d/%m/%Y").date()
-                ck = True
+                ck_d = True
             except ValueError:
                 print("Data non valida!")
-                ck=False
-        self.numero_identificazione_tessera = controlla(" NUMERO IDENTIFICAZIONE TESSERA : ", 20)# sulla tessera sanitaria fisica sono 20 caratteri alfanumerici
+                ck_d=False
+        self.numero_identificazione_tessera = controlla_lunghezza(" NUMERO IDENTIFICAZIONE TESSERA (es. 12345678901234567890 ): ", 20)# sulla tessera sanitaria fisica sono 20 caratteri alfanumerici
 
     def associazione_tessera_a_db(self)->None:
+
         new_tessera = pd.DataFrame(
             [[
                 self.codice_fiscale,
@@ -89,7 +89,7 @@ class TesseraSanitaria :
                 ck : bool = False
 
                 while not ck:
-                    data_input = controlla("NUOVA DATA DI SCADENZA (gg/mm/aaaa) : ", 10)
+                    data_input = controlla_lunghezza("NUOVA DATA DI SCADENZA (gg/mm/aaaa) : ", 10)
                     try:
                         new_date = datetime.strptime(data_input, "%d/%m/%Y").date()
                         ck = True

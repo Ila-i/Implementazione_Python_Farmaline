@@ -1,4 +1,4 @@
-from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla, check_nascita
+from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla_lunghezza, check_nascita
 from classi.documenti.classe_tesserino_professionale import TesserinoProfessionale
 from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
 from funzioni_generali.random_function import create_random_string
@@ -31,7 +31,7 @@ class Persona (ABC) :
     @classmethod
     def registrazione_utente(cls) -> bool:
 
-        """Restituisce True se la registarzione è avvenuta correttamente
+        """Restituisce True se la registrazione è avvenuta correttamente
         Altrimenti vengono terminate le operazioni
         """
 
@@ -91,10 +91,11 @@ class ProfiloUtente(ABC):
             return True
 
     @classmethod
-    def get_profilo(cls, username :str ) -> "ProfiloUtente":#"ProfiloUtente" usato per indicare che la funzione può essere chiamta dalla classe senza che venga istanziata
+    def get_profilo(cls, username :str ) -> "ProfiloUtente": #"ProfiloUtente" usato per indicare che la funzione può essere chiamta dalla classe senza che venga istanziata
 
         """Restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente
         Restituisce None altrimenti"""
+
         query = f"SELECT password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
         profile = pd.read_sql_query(query, connection)
 
@@ -373,10 +374,10 @@ class ProfiloCliente(ProfiloUtente) :
                 print("INSERIMENTO DATI CARTA")
                 nome = check_se_vuoto("Inserire il nome dell'intestatario : ")
                 cognome = check_se_vuoto("Inserire il cognome dell'intestatario : ")
-                numero_carta = controlla("Inserire numero della carta : ", 16)
+                numero_carta = controlla_lunghezza("Inserire numero della carta : ", 16)
 
                 while not ck_data :
-                    data_input = controlla("Inserire  data di scadenza della carta(gg/mm/aaaa): ", 10)
+                    data_input = controlla_lunghezza("Inserire  data di scadenza della carta(gg/mm/aaaa): ", 10)
 
                     try:
                         data_scadenza = datetime.strptime(data_input, "%d/%m/%Y").date()
@@ -385,7 +386,7 @@ class ProfiloCliente(ProfiloUtente) :
                         print("Data non valida!")
                         ck_data = False
 
-                cvc = controlla("Inserire il CVC : ", 3)
+                cvc = controlla_lunghezza("Inserire il CVC : ", 3)
 
                 print("DATI DELLA CARTA")
                 print(f"NOME : {nome}")
@@ -660,7 +661,7 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
                 farma = pd.read_sql(query, connection)
 
                 if not farma.empty:
-                    cod_fisc = controlla("Inserire il codice fiscale del paziente a cui si sta prescrivendo il farmaco : ", 16)
+                    cod_fisc = controlla_lunghezza("Inserire il codice fiscale del paziente a cui si sta prescrivendo il farmaco : ", 16)
 
                     cod_ricetta = ((create_random_string(4, string.digits)
                                    + create_random_string(1, string.ascii_uppercase))
