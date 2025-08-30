@@ -30,6 +30,11 @@ class Persona (ABC) :
 
     @classmethod
     def registrazione_utente(cls) -> bool:
+
+        """Restituisce True se la registarzione è avvenuta correttamente
+        Altrimenti vengono terminate le operazioni
+        """
+
         print("Creazione profilo utente, seguire le istruzioni mostrate di seguito :")
 
         verifica: bool = False
@@ -86,8 +91,10 @@ class ProfiloUtente(ABC):
             return True
 
     @classmethod
-    def get_profilo(cls, username) -> "ProfiloUtente":#"ProfiloUtente" usato per indicare che la funzione può essere chiamta dalla classe senza che venga istanziata
+    def get_profilo(cls, username :str ) -> "ProfiloUtente":#"ProfiloUtente" usato per indicare che la funzione può essere chiamta dalla classe senza che venga istanziata
 
+        """Restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente
+        Restituisce None altrimenti"""
         query = f"SELECT password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
         profile = pd.read_sql_query(query, connection)
 
@@ -119,9 +126,13 @@ class ProfiloUtente(ABC):
             print("Operazione fallita")
             pass
 
-    @staticmethod
-    def accesso_utente() -> "str" :
+    @classmethod
+    def accesso_utente(cls) -> "str" :
 
+        """ Ritorna il nome utente quando l'operazione va a buon fine.
+        Ritorna 2 se ci si vuole registare.
+        Ritorna exit per terminare le operazioni.
+        """
         username: str
         tentativi: int = 3
 
@@ -464,6 +475,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
             for farmaco in riordinare.to_dict(orient="records"):
                 print(farmaco)
         else:
+            print("Non ci sono prodotti che stanno per terminare o sono già terminati")
             return None
 
         while not controllo_scelta:

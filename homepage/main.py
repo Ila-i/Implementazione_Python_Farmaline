@@ -7,10 +7,7 @@ ck_op: bool = False #ck abbreviazione per check
 ck_f : bool = False # controllo usato nella sezione del faramcista
 ck_m : bool = False # controllo usato nella sezione del medico
 
-
-opzioni : str = "1"
-controllo : bool
-profilo : Optional[ProfiloUtente] #può assumere
+profilo : Optional[ProfiloUtente] #può assumere valore priflo utente o None
 
 operazione : str # per registare la scelta dell'utente tra accedere e registrarsi
 
@@ -22,14 +19,12 @@ operazione= input()
 # Operazioni con scelta di accesso al servizio
 while operazione == "1":
 
-    operazione = ProfiloUtente.accesso_utente() # ritorna : il nome utente quando l'operazione va a buon fine,
-                                                #           2 se ci si vuole registare
-                                                #           exit per terminare le operazioni
+    operazione = ProfiloUtente.accesso_utente()
 
-    profilo = ProfiloUtente.get_profilo(operazione) # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente
+    profilo = ProfiloUtente.get_profilo(operazione)
 
     if operazione == "2" :
-        if Persona.registrazione_utente() : # se è vero la registarzione è avvenuta correttamente , altrimenti vengono terminate le operazioni
+        if Persona.registrazione_utente() :
             operazione = "1" #per poi procedere all'acesso
         else :
             operazione = "exit"
@@ -37,23 +32,24 @@ while operazione == "1":
 # Operazioni con scelta di registrazione al servizio
 while operazione == "2":
     verifica: bool
-    verifica = Persona.registrazione_utente()# se è vero la registarzione è avvenuta correttamente , altrimenti vengono terminate le operazioni
+    verifica = Persona.registrazione_utente()
 
     if verifica:
-        operazione = ProfiloUtente.accesso_utente() # ritorna : il nome utente quando l'operazione va a buon fine,
-                                                    #           2 se ci si vuole registare
-                                                    #           exit per terminare le operazioni
-        profilo = ProfiloUtente.get_profilo(operazione)  # restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente
+        operazione = ProfiloUtente.accesso_utente()
+        profilo = ProfiloUtente.get_profilo(operazione)
     else:
         operazione = "exit"
 
 
 if isinstance( profilo , ProfiloUtente) : # dentro il servizio della farmacia
 
+    opzioni: str = "1"
+
     # sezione dedicata al cliente
     if  isinstance(profilo , ProfiloCliente):
 
-        check_tessera = TesseraSanitaria.check_se_ancora_valida(profilo.id_utente) #controlla che la tessera sanitaria sia ancora in regola
+        check_tessera = TesseraSanitaria.check_se_ancora_valida(profilo.id_utente)
+
         if check_tessera is not None :
             while opzioni == "1":
                 profilo.search_bar()
