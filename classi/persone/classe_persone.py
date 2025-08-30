@@ -1,3 +1,5 @@
+from dateutil.utils import today
+
 from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla_lunghezza, check_nascita
 from classi.documenti.classe_tesserino_professionale import TesserinoProfessionale
 from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
@@ -6,13 +8,14 @@ from classi.oggetti.classe_ricetta import Ricetta
 from classi.oggetti.classe_ordine import Ordine
 from abc import ABC, abstractmethod
 from datetime import datetime, date
-from sqlalchemy import text
 from database.db import connection
+from sqlalchemy import text
 import pandas as pd
 import string
 
 
 class Persona (ABC) :
+
     nome: str
     cognome: str
 
@@ -35,34 +38,32 @@ class Persona (ABC) :
         Altrimenti vengono terminate le operazioni
         """
 
-        print("Creazione profilo utente, seguire le istruzioni mostrate di seguito :")
+        print("Per registrarsi seguire le istruzioni mostrate di seguito")
 
         verifica: bool = False
         pearson: Persona
 
         while not verifica:
 
-            print("Se si desidera iscriversi come cliente digitare 1")
-            print("Se si desidera iscriversi come farmacista digitare 2 ")
-            print("Se si desidera iscriversi come medico digitare 3 ")
+            print("Digitare 1 se si desidera iscriversi come cliente")
+            print("Digitare 2 se si desidera iscriversi come farmacista")
+            print("Digitare 3 se si desidera iscriversi come medico")
             controllo = input()
 
             if controllo == '1':
                 pearson = Cliente()
-                break
+                return pearson.iscriversi()
 
             elif controllo == '2':
                 pearson = LavoratoreSanitario("farmacista")
-                break
+                return pearson.iscriversi()
 
             elif controllo == '3':
                 pearson = LavoratoreSanitario("medico")
-                break
+                return pearson.iscriversi()
 
             else:
                 print("opzione non valida riprovare")
-
-        return pearson.iscriversi()
 
 class ProfiloUtente(ABC):
 
@@ -78,12 +79,16 @@ class ProfiloUtente(ABC):
         self.tipo_profilo = tipo_p
 
     @abstractmethod
-    def associazione_profilo_utente(self) -> None:
+    def aggiunta_profilo_utente_a_db(self) -> None:
         ...
 
     def controllo_nome_utente(self) -> bool:
+
+        """Verifica che il nome utente inserito per la registrazione non sia già in uso"""
+
         query = f"SELECT * FROM ProfiloUtente WHERE nome_utente = '{self.nome_utente}'"
         profilo_esistente = pd.read_sql(query, connection)
+
         if not profilo_esistente.empty:  # pd.read_sql(...) restituisce sempre un DataFrame di pandas.
             print(f"Il nome utente '{self.nome_utente}' è già in uso. Scegliere un altro nome.")
             return False
@@ -91,9 +96,9 @@ class ProfiloUtente(ABC):
             return True
 
     @classmethod
-    def get_profilo(cls, username :str ) -> "ProfiloUtente": #"ProfiloUtente" usato per indicare che la funzione può essere chiamta dalla classe senza che venga istanziata
+    def get_profilo(cls, username :str ) -> "ProfiloUtente": #"ProfiloUtente" usato per indicare che la funzione può restiture un oggetto di quella classe senza che venga istanziata
 
-        """Restituisce il profilo con cui si fa l'accesso se l'operazione si è conclusa correttamente
+        """Restituisce il ProfiloUtente con cui si fa l'accesso se l'operazione si è conclusa correttamente
         Restituisce None altrimenti"""
 
         query = f"SELECT password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
@@ -131,7 +136,7 @@ class ProfiloUtente(ABC):
     def accesso_utente(cls) -> "str" :
 
         """ Ritorna il nome utente quando l'operazione va a buon fine.
-        Ritorna 2 se ci si vuole registare.
+        Ritorna 2 se si vuole passare al processo di registazione.
         Ritorna exit per terminare le operazioni.
         """
         username: str
@@ -154,12 +159,12 @@ class ProfiloUtente(ABC):
             if tentativi == 0:
 
                 op: str  # abbreviazione per operazione
-                print("se non si è in possesso di un profilo utente già registrato selezionare 2 per iscriversi al servizio")
-                print("digitare exit se si vuole terminare le operazioni")
+                print("Digitare 2 per iscriversi al servizio se non si è in possesso di un profilo utente già registrato")
+                print("Digitare exit se si vuole terminare le operazioni")
                 op = input()
                 return op
 
-        # sezione dedicata al controllo password, si esegue questa sezione quando viene trovato il nome utente nel database
+        # sezione dedicata al controllo password, si esegue questa sezione solo quando viene trovato il nome utente nel database
         if tentativi > 0:
 
             pw: str  # pw abbrevviazione per password
@@ -183,19 +188,26 @@ class ProfiloUtente(ABC):
 
 class ProfilolavoratoreSanitario(ProfiloUtente) :
 
-    def associazione_profilo_utente(self) -> None:
+    def aggiunta_profilo_utente_a_db(self) -> None:
 
-        new_profile = pd.DataFrame(  # prf fa riferimento al profilo utente da associare alla relativa tebella
-            columns=['nome_utente', 'password', 'tipo_profilo', 'id_sanitari'],
+        new_profile = pd.DataFrame(
+            columns=[
+                'nome_utente',
+                'password',
+                'tipo_profilo',
+                'id_sanitari'
+            ],
             data=[
-                [self.nome_utente, self.password, self.tipo_profilo, self.id_utente]
+                self.nome_utente,
+                self.password,
+                self.tipo_profilo,
+                self.id_utente
             ]
         )
         new_profile.to_sql('ProfiloUtente', connection, if_exists='append', index=False)
         connection.commit()
 
         print("Profilo utente aggiunto con successo.")
-        return None
 
 class ProfiloCliente(ProfiloUtente) :
 
@@ -207,37 +219,44 @@ class ProfiloCliente(ProfiloUtente) :
         self.ordine=Ordine()
         self.ricetta= Ricetta(self.id_utente)
 
-    def associazione_profilo_utente(self) -> None:
+    def aggiunta_profilo_utente_a_db(self) -> None:
 
-        new_profile = pd.DataFrame(  # prf fa riferimento al profilo utente da associare alla relativa tebella
-            columns=['nome_utente', 'password', 'tipo_profilo', 'id_cliente'],
+        new_profile = pd.DataFrame(
+            columns=[
+                'nome_utente',
+                'password',
+                'tipo_profilo',
+                'id_cliente'
+            ],
             data=[
-                [self.nome_utente, self.password, self.tipo_profilo, self.id_utente]
+                self.nome_utente,
+                self.password,
+                self.tipo_profilo,
+                self.id_utente
             ]
         )
         new_profile.to_sql('ProfiloUtente', connection, if_exists='append', index=False)
         connection.commit()
 
         print("Profilo utente aggiunto con successo.")
-        return None
 
     def search_bar(self) -> None:
-        #richiama self.aggiunta_carrello
-        medicinale: str
-        filtri: str
-        aggiungi_carrello: str
+
+        scelta_filtri: str
 
         print("BARRA DI RICERCA")
-        filtri = input("Vuoi applicare dei filtri alla tua ricerca? (digitare si o no) : ")
+        scelta_filtri = input("Vuoi applicare dei filtri alla tua ricerca? (digitare si o no) : ")
 
-        if filtri == "si":
+        if scelta_filtri == "si":
+
             print("Indica almeno uno dei seguenti filtri, quando non si vuole mettere un filtro premere semplicemente invio")
             indicazioni_terapeutiche = input("Inserire le indicazioni terapeutiche : ")
             composizione = input("Inserire la composizione: ")
             posologia = input("Inserire la posologia : ")
 
-            filters = []  # lista
-            if indicazioni_terapeutiche:
+            filters: list[str] = []
+
+            if indicazioni_terapeutiche:#todo cosa significa questo if?
                 filters.append(f"LOWER(s.indicazioni_terapeutiche) LIKE LOWER ('%{indicazioni_terapeutiche}%')")
 
             if composizione:
@@ -266,16 +285,19 @@ class ProfiloCliente(ProfiloUtente) :
                     JOIN SchedaTecnica AS s
                       ON f.codice = s.codice 
                     """
+
             if filters:
-                query += " WHERE " + " AND ".join(filters)
+                query += " WHERE " + " AND ".join(filters) # compone una stringa con le clausole WHERE e AND che viene aggiunta alla query per applicare i filtri inseriti dall'utente
                 results = pd.read_sql(query, connection)
 
             else:
                 print("Nessun filtro inserito. Ricerca annullata.")
                 results = pd.DataFrame()  # equivalente a lista vuota
 
-        elif filtri == "no":
-            medicinale = input("Digitare il nome del farmaco che si sta cercando(premendo invio si visualizza tutto l'elenco): ")
+        elif scelta_filtri == "no":
+
+            medicinale: str
+            medicinale = input("Digitare il nome del farmaco che si sta cercando (premendo invio si visualizzano tutti i prodotti disponili in magazzino): ")
 
             query = f"""
                     SELECT
@@ -295,9 +317,10 @@ class ProfiloCliente(ProfiloUtente) :
                     FROM FarmaciMagazzino AS f
                     JOIN SchedaTecnica AS s
                       ON f.codice = s.codice
-                        WHERE LOWER(TRIM(f.nome)) LIKE LOWER('%{medicinale}%') -- TRIM dà più tolleranza sugli spazi
-                                """
+                        WHERE LOWER(TRIM(f.nome)) LIKE LOWER('%{medicinale}%') -- TRIM dà più tolleranza sugli spazi 
+                                """# todo trim va lasciato ?
             results = pd.read_sql(query, connection)
+
         else:
             print("Operazione non valida.")
             results = pd.DataFrame()  # equivalente a lista vuota
@@ -311,45 +334,49 @@ class ProfiloCliente(ProfiloUtente) :
 
         if results.empty:
             print("Nessun farmaco trovato.")
-            return  # torna al menu precedente
 
     def scelta_indirizzi(self) -> None:
 
-        indirizzo_domicilio: str
-        scelta_ind: str = "exit"
-        controllo_ricetta: int
-
-        controllo_ricetta = self.ricetta.verifica_dati_ricetta(self.ordine.carrello, self.ordine.quanto_compro)
+        controllo_ricetta: int = self.ricetta.verifica_dati_ricetta(self.ordine.carrello, self.ordine.quanto_compro)
 
         if len(self.ordine.carrello) > 0 :
-            if controllo_ricetta == 0:
-                print("per ricevere l'ordine a domicilio digitare 1")
-                print("per ritirare l'ordine nella farmacia fisica 2")
-                scelta_ind = input()
-            elif controllo_ricetta > 0:
-                scelta_ind= "2"
 
-            if scelta_ind == "1":
-                indirizzo_domicilio = input("Inserire l'indirizzo di domicilio a cui si vuole ricevere l'ordine : ")
-                print(f"Operazione andata a buon fine, l'ordine sarà spedito presso {indirizzo_domicilio}")
-                self.pagare(indirizzo_domicilio)
+            ck_op :bool = False
+            scelta_ind: str = "exit"
 
+            while not ck_op:
 
-            elif scelta_ind== "2":
-                print("L'ordine potrà essere ritirato entro 10 giorni presso la nostra sede fisica in Via Univeristà di Santa Marta, 26")
-                print("Operazione andata a buon fine")
+                if controllo_ricetta == 0:
 
-                self.pagare("Via Univeristà di Santa Marta, 26")
+                    print("per ricevere l'ordine a domicilio digitare 1")
+                    print("per ritirare l'ordine nella farmacia fisica 2")
+                    scelta_ind = input()
 
-            else:
-                print("operazione non valida ")
+                elif controllo_ricetta > 0:
+                    scelta_ind= "2"
+
+                if scelta_ind == "1":
+
+                    indirizzo_domicilio: str
+                    indirizzo_domicilio = input("Inserire l'indirizzo di domicilio a cui si vuole ricevere l'ordine : ")
+                    print(f"L'ordine sarà spedito presso {indirizzo_domicilio}")
+
+                    self.pagare(indirizzo_domicilio)
+                    ck_op = True
+
+                elif scelta_ind== "2":
+                    print("L'ordine potrà essere ritirato entro 10 giorni presso la nostra sede fisica in Via Univeristà di Santa Marta, 26")
+
+                    self.pagare("Via Univeristà di Santa Marta, 26")
+                    ck_op = True
+
+                else:
+                    print("operazione non valida, riprovare ")
         else :
             print("il carrello è vuoto , l'operazione di acquisto verrà terminata")
 
     def pagare(self, indirizzo: str) -> None:
 
-        ck_data: bool = False
-        metodo: str
         prezzo_tot: float = 0
 
         self.ordine.stampa_carrello()
@@ -364,6 +391,9 @@ class ProfiloCliente(ProfiloUtente) :
         scelta = input()
 
         if scelta == "1":
+
+            metodo: str
+
             print("Scegliere metodo di pagamento")
             print("Digitare 1 per pagare con carta di credito o debito (American Express, Euro/Mastercard, Visa, Maestro)")
             print("Digitare 2 per pagare con portafoglio digitale (paypal , Google pay, Apple pay)")
@@ -371,11 +401,14 @@ class ProfiloCliente(ProfiloUtente) :
 
             if metodo == "1":
 
+                ck_data: bool = False
+                data_scadenza : datetime.date = today()
+
                 print("INSERIMENTO DATI CARTA")
                 nome = check_se_vuoto("Inserire il nome dell'intestatario : ")
                 cognome = check_se_vuoto("Inserire il cognome dell'intestatario : ")
                 numero_carta = controlla_lunghezza("Inserire numero della carta (es. 1234567890123456 ): ", 16)
-
+                cvc = controlla_lunghezza("Inserire il CVC (es. 123 ): ", 3)
                 while not ck_data :
                     data_input = controlla_lunghezza("Inserire  data di scadenza della carta(es. gg/mm/aaaa ): ", 10)
 
@@ -385,8 +418,6 @@ class ProfiloCliente(ProfiloUtente) :
                     except ValueError:
                         print("Data non valida!")
                         ck_data = False
-
-                cvc = controlla_lunghezza("Inserire il CVC (es. 123 ): ", 3)
 
                 print("DATI DELLA CARTA")
                 print(f"NOME : {nome}")
@@ -412,10 +443,8 @@ class ProfiloCliente(ProfiloUtente) :
             else :
                 print("Opzione non valida")
 
-            return None
-
         elif scelta == "exit":
-            return None
+            print("Operazione annullata")
         else:
             print("Opzione non valida")
 
@@ -758,7 +787,7 @@ class LavoratoreSanitario (Persona) :#classe base
             profilo.nome_utente = nuovo_nome
             ck = profilo.controllo_nome_utente()
 
-        profilo.associazione_profilo_utente()
+        profilo.aggiunta_profilo_utente_a_db()
 
         print("registrazione effettuata con successo.")
         print(f"        Benvenuto {profilo.nome_utente} !")
@@ -827,7 +856,7 @@ class Cliente(Persona):
             profilo.nome_utente = nuovo_nome
             ck = profilo.controllo_nome_utente()
 
-        profilo.associazione_profilo_utente()
+        profilo.aggiunta_profilo_utente_a_db()
 
         print("registrazione effettuata con successo.")
         print(f"        Benvenuto {profilo.nome_utente} !")

@@ -1,7 +1,7 @@
 from funzioni_generali.controlli_function import controlla_lunghezza, check_se_vuoto, check_scadenza
 from datetime import datetime, date
-from sqlalchemy import text
 from database.db import connection
+from sqlalchemy import text
 import pandas as pd
 
 class TesseraSanitaria :
@@ -47,15 +47,6 @@ class TesseraSanitaria :
     def associazione_tessera_a_db(self)->None:
 
         new_tessera = pd.DataFrame(
-            [[
-                self.codice_fiscale,
-                self.sesso,
-                self.luogo_nascita,
-                self.provincia,
-                self.data_nascita,
-                self.data_scadenza,
-                self.numero_identificazione_tessera
-            ]],
             columns=[
                 'codice_fiscale',  # <-- niente spazio finale
                 'sesso',
@@ -64,6 +55,15 @@ class TesseraSanitaria :
                 'data_nascita',
                 'data_scadenza',
                 'numero_identificazione_tessera'
+            ],
+            data = [
+                self.codice_fiscale,
+                self.sesso,
+                self.luogo_nascita,
+                self.provincia,
+                self.data_nascita,
+                self.data_scadenza,
+                self.numero_identificazione_tessera
             ]
         )
         new_tessera.to_sql('TesseraSanitaria', connection, if_exists='append', index=False)

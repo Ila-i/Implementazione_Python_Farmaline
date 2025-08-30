@@ -1,4 +1,4 @@
-from classi.persone.classe_persona import ProfiloUtente, ProfiloCliente, ProfiloFarmacista, ProfiloMedico, Persona
+from classi.persone.classe_persone import ProfiloUtente, ProfiloCliente, ProfiloFarmacista, ProfiloMedico, Persona
 from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
 from typing import Optional
 
@@ -69,15 +69,15 @@ if isinstance( profilo , ProfiloUtente) :
 
             ck_op: bool = False  # abbreviazione per check_opzioni
 
-            print("Se si desidera aggiornare il magazzino digitare 1")
-            print("Per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna digitare 2")
-            print("Per terminare le operazioni digitare exit.")
+            print("Digitare 1 se si desidera aggiornare il magazzino")
+            print("Digitare 2 per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna")
+            print("Digitare exit per terminare le operazioni")
             opzioni_f = input()
 
             if opzioni_f == "1":
                 profilo.aggiorna_magazzino()
-                print("Se si desidera aggiungere nuovi farmaci al magazzino digitare 1")
-                print("Per terminare le operazioni digitare exit.")
+                print("Digitare 1 se si desidera aggiungere nuovi farmaci al magazzino")
+                print("Digitare exit per terminare le operazioni")
                 opzioni_f = input()
 
                 if opzioni_f == "2":
@@ -86,23 +86,23 @@ if isinstance( profilo , ProfiloUtente) :
             while opzioni_f == "1":
                 print("PROCEDURA DI AGGIUNTA FARMACI")
                 profilo.aggiunta_farmaci()
-                print("Se si desidera continuare a aggiungere nuovi farmaci al magazzino digitare 1")
-                print("Per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna digitare 2")
-                print("Per terminare le operazioni digitare exit.")
+                print("Digitare 1 se si desidera continuare a aggiungere nuovi farmaci al magazzino")
+                print("Digitare 2 per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna")
+                print("Digitare exit per terminare le operazioni")
                 opzioni_f = input()
 
             while opzioni_f == "2" and not ck_op:
                 print("PROCEDURA DI VERIFICA")
                 profilo.verifica_ordine()
-                print("Se si desidera aggiungere nuovi farmaci al magazzino digitare 1")
-                print("Per verificare l'esistenza di un altro ordine e confermare l'avvenuta consegna digitare 2")
-                print("Per terminare le operazioni digitare exit.")
+                print("Digitare 1 se si desidera aggiungere nuovi farmaci al magazzino")
+                print("Digitare 2 per verificare l'esistenza di un altro ordine e confermare l'avvenuta consegna")
+                print("Digitare exit per terminare le operazioni")
                 opzioni = input()
 
             if opzioni_f == "exit" :
                 ck_f = True
             else:
-                print("operazione inesistente")
+                print("Operazione inesistente")
                 ck_op = False
 
     #sezione dedicata al medico
@@ -112,21 +112,21 @@ if isinstance( profilo , ProfiloUtente) :
         ck_m: bool = False #ck abbreviazione per check_medico
 
         while not ck_m :
-            print("Se si desidera prescivere una ricetta medica digitare 1")
-            print("Se si desidera terminare le operazioni digitare exit")
+            print("Digitare 1 se si desidera prescivere una ricetta medica")
+            print("Digitare exit se si desidera terminare le operazioni")
             opzioni_m = input()
 
             while opzioni_m == "1" :
                 print("PROCEDURA DI PRESCRIZIONE RICETTA MEDICA")
                 profilo.crea_ricetta()
-                print("Se si desidera prescivere un'altra ricetta medica digitare 1")
-                print("Se si desidera terminare le operazioni digitare exit")
+                print("Digitare 1 se si desidera prescivere un'altra ricetta medica")
+                print("Digitare exit se si desidera terminare le operazioni")
                 opzioni_m = input()
 
             if opzioni_m == "exit" :
                 ck_m = True
             else :
-                print("operazione inesistente")
+                print("Operazione inesistente")
 
     else:
         print("Operazione non valida")
