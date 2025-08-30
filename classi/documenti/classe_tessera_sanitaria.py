@@ -1,7 +1,7 @@
 from funzioni_generali.controlli_function import controlla_lunghezza, check_se_vuoto, check_scadenza
 from datetime import datetime, date
 from sqlalchemy import text
-from db import connection
+from database.db import connection
 import pandas as pd
 
 class TesseraSanitaria :

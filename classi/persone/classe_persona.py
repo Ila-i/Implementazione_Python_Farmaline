@@ -7,7 +7,7 @@ from classi.oggetti.classe_ordine import Ordine
 from abc import ABC, abstractmethod
 from datetime import datetime, date
 from sqlalchemy import text
-from db import connection
+from database.db import connection
 import pandas as pd
 import string
 

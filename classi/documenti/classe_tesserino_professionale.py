@@ -1,5 +1,5 @@
 from funzioni_generali.controlli_function import check_se_vuoto
-from db import connection
+from database.db import connection
 import pandas as pd
 
 

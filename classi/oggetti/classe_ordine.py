@@ -1,5 +1,5 @@
 from sqlalchemy import text
-from db import connection
+from database.db import connection
 import pandas as pd
 import random
 
