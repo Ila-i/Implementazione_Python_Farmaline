@@ -72,6 +72,8 @@ class TesseraSanitaria :
     @classmethod
     def check_se_ancora_valida(cls, codice_f: str )->None:
 
+        """Restiurse None solo se non viene aggiornata la data di scadenza della tessera"""
+
         new_date : datetime.date = date.today()
         query = f"SELECT data_scadenza FROM TesseraSanitaria WHERE codice_Fiscale= '{codice_f}'"
         data = pd.read_sql_query(query, connection)

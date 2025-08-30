@@ -359,14 +359,14 @@ class ProfiloCliente(ProfiloUtente) :
 
         print(f"Prezzo totale dell'ordine : {prezzo_tot} €")
 
-        print("se si desidera procedere all'acquisto digitare 1")
-        print("se si desidera annullare l'operazione digitare exit")
+        print("Digitare 1 se si desidera procedere al pagamento")
+        print("Digitare exit se si desidera annullare l'operazione")
         scelta = input()
 
         if scelta == "1":
             print("Scegliere metodo di pagamento")
-            print("digitare 1 per pagare con carta di credito o debito (American Express, Euro/Mastercard, Visa, Maestro)")
-            print("digitare 2 per pagare con portafoglio digitale (paypal , Google pay, Apple pay)")
+            print("Digitare 1 per pagare con carta di credito o debito (American Express, Euro/Mastercard, Visa, Maestro)")
+            print("Digitare 2 per pagare con portafoglio digitale (paypal , Google pay, Apple pay)")
             metodo = input()
 
             if metodo == "1":
@@ -374,10 +374,10 @@ class ProfiloCliente(ProfiloUtente) :
                 print("INSERIMENTO DATI CARTA")
                 nome = check_se_vuoto("Inserire il nome dell'intestatario : ")
                 cognome = check_se_vuoto("Inserire il cognome dell'intestatario : ")
-                numero_carta = controlla_lunghezza("Inserire numero della carta : ", 16)
+                numero_carta = controlla_lunghezza("Inserire numero della carta (es. 1234567890123456 ): ", 16)
 
                 while not ck_data :
-                    data_input = controlla_lunghezza("Inserire  data di scadenza della carta(gg/mm/aaaa): ", 10)
+                    data_input = controlla_lunghezza("Inserire  data di scadenza della carta(es. gg/mm/aaaa ): ", 10)
 
                     try:
                         data_scadenza = datetime.strptime(data_input, "%d/%m/%Y").date()
@@ -386,7 +386,7 @@ class ProfiloCliente(ProfiloUtente) :
                         print("Data non valida!")
                         ck_data = False
 
-                cvc = controlla_lunghezza("Inserire il CVC : ", 3)
+                cvc = controlla_lunghezza("Inserire il CVC (es. 123 ): ", 3)
 
                 print("DATI DELLA CARTA")
                 print(f"NOME : {nome}")
@@ -398,9 +398,9 @@ class ProfiloCliente(ProfiloUtente) :
                 ck_data = check_scadenza(data_scadenza)
 
                 if not ck_data:
-                    print("operazione fallita")#carta scaduta
+                    print("Operazione fallita") # se la carta è scaduta
                 else:
-                    print("operazione andata a buon fine")
+                    print("Operazione andata a buon fine")
                     self.ordine.associa_numero_ordine(indirizzo, self.id_utente)
                     self.ordine.update_database(self.id_utente)
 

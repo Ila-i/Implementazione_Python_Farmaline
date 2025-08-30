@@ -38,7 +38,6 @@ while operazione == "2":
 if isinstance( profilo , ProfiloUtente) :
     #sezione eseguibile solo dopo aver effettuato l'accesso al servizio
 
-
     # sezione dedicata al cliente
     if  isinstance(profilo , ProfiloCliente):
 
@@ -47,10 +46,11 @@ if isinstance( profilo , ProfiloUtente) :
         check_tessera = TesseraSanitaria.check_se_ancora_valida(profilo.id_utente)
 
         if check_tessera is not None :
+
             while opzioni_c == "1":
                 profilo.search_bar()
-                print("Se si desidera continuare a ricercare medicinali da acquistare digitare 1")
-                print("Se si desidera terminare la ricerca e procedere all'acquisto digitare 2")
+                print("Digitare 1 se si desidera continuare a ricercare medicinali da acquistare ")
+                print("Digitare 2 se si desidera terminare la ricerca e procedere all'acquisto ")
                 opzioni_c = input()
 
             if opzioni_c == "2":
@@ -58,7 +58,7 @@ if isinstance( profilo , ProfiloUtente) :
                 profilo.scelta_indirizzi()
 
             else:
-                print("operazione non disponibile")
+                print("Operazione non disponibile")
 
     # sezione dedicata al farmacista
     elif isinstance(profilo , ProfiloFarmacista) :
