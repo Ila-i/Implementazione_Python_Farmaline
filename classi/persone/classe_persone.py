@@ -7,7 +7,7 @@ from classi.oggetti.classe_ricetta import Ricetta
 from classi.oggetti.classe_ordine import Ordine
 from abc import ABC, abstractmethod
 from datetime import datetime, date
-from database.db import connection
+from db import connection
 from dateutil.utils import today
 from sqlalchemy import text
 import pandas as pd

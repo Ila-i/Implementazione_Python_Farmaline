@@ -1,6 +1,6 @@
 from funzioni_generali.controlli_function import controlla_lunghezza, check_se_vuoto, check_scadenza
 from datetime import datetime, date
-from database.db import connection
+from db import connection
 from sqlalchemy import text
 import pandas as pd
 
