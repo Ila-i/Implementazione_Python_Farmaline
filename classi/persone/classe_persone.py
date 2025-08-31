@@ -1,15 +1,14 @@
-from classi.documenti.classe_scheda_tecninca import SchedaTecnica
-from classi.oggetti.classe_farmaco import Farmaco
 from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla_lunghezza, check_nascita
 from classi.documenti.classe_tesserino_professionale import TesserinoProfessionale
 from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
+from classi.oggetti.classe_farmaco import Farmaco
 from classi.oggetti.classe_ricetta import Ricetta
 from classi.oggetti.classe_ordine import Ordine
 from abc import ABC, abstractmethod
 from datetime import datetime, date
-from db import connection
 from dateutil.utils import today
 from sqlalchemy import text
+from db import connection
 import pandas as pd
 
 class Persona (ABC) :
@@ -136,7 +135,7 @@ class ProfiloUtente(ABC):
             pass
 
     @classmethod
-    def accesso_utente(cls) -> "str" :
+    def accesso_utente(cls) -> str:
 
         """ Ritorna il nome utente quando l'operazione va a buon fine.
         Ritorna 2 se si vuole passare al processo di registazione.
