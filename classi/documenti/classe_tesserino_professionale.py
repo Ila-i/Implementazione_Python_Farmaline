@@ -12,7 +12,7 @@ class TesserinoProfessionale :
         self.ordine_di_appartenenza = ordine
         self.n_matricola =check_se_vuoto("Inserire il proprio numero di matricola : ")
 
-    def aggiunta_tessera_a_db(self)->None:
+    def aggiungi_tessera_a_db(self)->None:
 
         new_tesserino = pd.DataFrame(
             columns=[

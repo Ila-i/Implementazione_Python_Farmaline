@@ -686,7 +686,7 @@ class LavoratoreSanitario (Persona) :#classe base
 
     def aggiungi_persona_a_db(self)-> None:
 
-        self.t_p.aggiunta_tessera_a_db()
+        self.t_p.aggiungi_tessera_a_db()
         new_lav_sani = pd.DataFrame(
             columns=[
                 'nome',
@@ -767,7 +767,7 @@ class Cliente(Persona):
 
     def aggiungi_persona_a_db(self)->None:
 
-        self.t_s.aggiunta_tessera_a_db()
+        self.t_s.aggiungi_tessera_a_db()
 
         new_cliente = pd.DataFrame(
             columns=[
