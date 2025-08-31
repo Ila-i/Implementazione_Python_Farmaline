@@ -44,6 +44,7 @@ class Persona (ABC) :
 
         while not verifica:
 
+
             print("Digitare 1 se si desidera iscriversi come cliente")
             print("Digitare 2 se si desidera iscriversi come farmacista")
             print("Digitare 3 se si desidera iscriversi come medico")
