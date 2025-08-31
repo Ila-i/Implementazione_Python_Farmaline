@@ -12,7 +12,6 @@ from dateutil.utils import today
 from sqlalchemy import text
 import pandas as pd
 
-
 class Persona (ABC) :
 
     nome: str
