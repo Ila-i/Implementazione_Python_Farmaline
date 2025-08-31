@@ -98,7 +98,7 @@ class ProfiloUtente(ABC):
             return True
 
     @classmethod
-    def get_profilo(cls, username :str ) -> "ProfiloUtente": #"ProfiloUtente" usato per indicare che la funzione può restiture un oggetto di quella classe senza che venga istanziata
+    def get_profilo(cls, username :str ) -> "ProfiloUtente": #"ProfiloUtente" usato per indicare cheil metodo può restiture un oggetto della classe senza che venga istanziata
 
         """Restituisce il ProfiloUtente con cui si fa l'accesso se l'operazione si è conclusa correttamente
         Restituisce None altrimenti"""
@@ -756,7 +756,7 @@ class Cliente(Persona):
         while not ck_profilo:
             nuovo_nome = check_se_vuoto("Inserisci un altro nome utente: ")
             profilo.nome_utente = nuovo_nome
-            ck_profile = profilo.controllo_nome_utente()
+            ck_profilo = profilo.controllo_nome_utente()
 
         profilo.aggiunta_profilo_utente_a_db()
 
