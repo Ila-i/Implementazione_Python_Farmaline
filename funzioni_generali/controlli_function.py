@@ -1,10 +1,14 @@
-# funzioni applicabile a tutte le classi
 from datetime import datetime
 from datetime import date
 
-#per il controllo di lunghezza stringa
-#retituisce il parametro corretto
 def controlla_lunghezza(messaggio: str, lunghezza: int) -> str :
+
+   """Controlla che il valore in inmput abbia la stessa lunghezza indicata dal parametro lunghezza
+
+   messaggio contiene il messaggio che si vuole stampare a schermo per dare indicazioni all'utente su cosa inserire
+   lunghezza indica quanto deve essere lungo il parametro da inserire in input come indicato dal messeggio
+
+   Ritrona il valore del parametro corretto """
 
    parametro = input(messaggio)
 
@@ -12,9 +16,11 @@ def controlla_lunghezza(messaggio: str, lunghezza: int) -> str :
         parametro = input(f" il parametro non è valido, riprovare : ")
    return parametro
 
-#per il controllo delle date di nascita, verifica che siano già passate
-#restituisce la data corretta , o la data del giorno corrente se si terminano i tentativi per inserire quella corretta
 def check_nascita(data:datetime.date)-> datetime.date:
+
+    """Controlla dche la data di nascita sia già passata
+
+    Ritorna la data corretta , o la data del giorno corrente se si terminano i tentativi per inserire quella corretta """
 
     ck: bool
     today = date.today() #funzione di Python che restituisce la data odierna
@@ -36,10 +42,13 @@ def check_nascita(data:datetime.date)-> datetime.date:
 
     return today
 
-#per il controllo delle date di scadenza, verifica che non siano già passate
-# restituisce true quando può continuare , e false quando deve cessare le operazioni
 def check_scadenza(data: datetime.date) -> bool:
 
+    """Controlla che le date di scadenza non siano già passate
+
+    Ritorns True quando può continuare
+    Ritrona False quando deve cessare le operazioni
+    """
     today = date.today()  # funzione di Python che restituisce la data odierna
 
     if data < today:
@@ -55,9 +64,12 @@ def check_scadenza(data: datetime.date) -> bool:
     else:
         return True
 
-#controlla che il parametro inserito non sia vuoto
-#retituisce il parametro corretto
 def check_se_vuoto(messaggio: str) -> str :
+
+   """Controlla che il parametro inserito non sia vuoto
+
+   Ritorna il valore del parametro corretto
+   """
 
    parametro = input(messaggio)
 

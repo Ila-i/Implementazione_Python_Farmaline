@@ -44,7 +44,7 @@ if isinstance( profilo , ProfiloUtente) :
 
         check_tessera = TesseraSanitaria.check_se_ancora_valida(profilo.id_utente)
 
-        if check_tessera is not None :
+        if check_tessera :
 
             while opzioni_c == "1":
                 profilo.search_bar()

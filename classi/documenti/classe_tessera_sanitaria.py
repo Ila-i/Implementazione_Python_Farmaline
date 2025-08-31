@@ -23,6 +23,7 @@ class TesseraSanitaria :
         self.sesso = controlla_lunghezza(" SESSO (es. X): ", 1)
         self.luogo_nascita = check_se_vuoto(" LUOGO DI NASCITA : ")
         self.provincia = controlla_lunghezza(" PROVINCIA ( es. RM): ", 2)
+
         #controllo che la data di nascita sia inserita correttamente
         while not ck_d:
             data_input = controlla_lunghezza(" DATA DI NASCITA (es. gg/mm/aaaa) : ", 10)
@@ -32,6 +33,7 @@ class TesseraSanitaria :
             except ValueError:
                 print("Data non valida!")
                 ck_d=False
+
         #controllo che la data di scadenza sia inserita correttamente
         ck_d= False
         while not ck_d:
@@ -42,6 +44,7 @@ class TesseraSanitaria :
             except ValueError:
                 print("Data non valida!")
                 ck_d=False
+
         self.numero_identificazione_tessera = controlla_lunghezza(" NUMERO IDENTIFICAZIONE TESSERA (es. 12345678901234567890 ): ", 20)# sulla tessera sanitaria fisica sono 20 caratteri alfanumerici
 
     def aggiunta_tessera_a_db(self)->None:
@@ -70,11 +73,16 @@ class TesseraSanitaria :
         connection.commit()
 
     @classmethod
-    def check_se_ancora_valida(cls, codice_f: str )->None:
+    def check_se_ancora_valida(cls, codice_f: str )->bool:
 
-        """Restiurse None solo se non viene aggiornata la data di scadenza della tessera"""
+        """Contolla se la tessera sanitaria dell'utente è ancora valida o se invece è scaduta
+
+        Restiurse False se non viene aggiornata la data di scadenza della tessera e il profilo viene eliminato
+        Restituisce True altrimenti
+        """
 
         new_date : datetime.date = date.today()
+
         query = f"SELECT data_scadenza FROM TesseraSanitaria WHERE codice_Fiscale= '{codice_f}'"
         data = pd.read_sql_query(query, connection)
         data_ck = data.iloc[0, 0]
@@ -90,6 +98,7 @@ class TesseraSanitaria :
 
                 ck : bool = False
 
+                #controllo che la data di scadenza inserita sia un valore valido
                 while not ck:
                     data_input = controlla_lunghezza("NUOVA DATA DI SCADENZA (gg/mm/aaaa) : ", 10)
                     try:
@@ -99,6 +108,7 @@ class TesseraSanitaria :
                         print("Data non valida!")
                         ck = False
 
+                #aggiorna la base dati
                 query = f"UPDATE TesseraSanitaria SET data_scadenza= '{new_date}' WHERE codice_Fiscale= '{codice_f}'"
                 connection.execute(text(query))
                 connection.commit()
@@ -115,9 +125,11 @@ class TesseraSanitaria :
                 query = f"DELETE FROM Clienti WHERE  codice_fiscale = '{codice_f}'"
                 connection.execute(text(query))
                 connection.commit()
-                return None
+                return False
 
             else:
                 print("operazione non valida")
 
             data_ck = check_scadenza(new_date)
+
+        return True

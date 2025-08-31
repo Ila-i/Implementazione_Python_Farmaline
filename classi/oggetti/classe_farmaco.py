@@ -1,3 +1,4 @@
+from classi.documenti.classe_scheda_tecninca import SchedaTecnica
 from funzioni_generali.controlli_function import check_se_vuoto
 from db import connection
 import pandas as pd
@@ -10,6 +11,7 @@ class Farmaco :
     prezzo: float
     quantity: int
     codice_farmaco: str
+    scheda_tecnica : SchedaTecnica
 
     def __init__(self, codice:str):
 
@@ -18,7 +20,9 @@ class Farmaco :
         self.preparato_galenico = check_se_vuoto("È un preparato galenico ? (digitare si o no) : ")
         self.quantity = 0
         self.prezzo = 0.0
+        self.codice_farmaco = codice
 
+        #per controllare che la quantità inserita sia un valore valido
         while self.quantity <= 0:
             try:
                 self.quantity = int(input("Inserire la quantità di farmaco che si vuole aggiungere in magazzino : "))
@@ -27,6 +31,7 @@ class Farmaco :
             if self.quantity <= 0:
                 print("Il parametro non può assumere valore negativo o nullo")
 
+        # per controllare che il prezzo inserito sia un valore valido
         ck_prezzo: bool = False
         while not ck_prezzo:
             try:
@@ -35,7 +40,11 @@ class Farmaco :
             except ValueError:
                 print("Il valore inserito non è compatibile, riprovare")
 
+        self.scheda_tecnica= SchedaTecnica()
+
     def aggiungi_farmaco_a_db(self)->None:
+
+        self.scheda_tecnica.aggiungi_scheda_a_db(self.codice_farmaco)
 
         farmaco = pd.DataFrame(
             columns=[
