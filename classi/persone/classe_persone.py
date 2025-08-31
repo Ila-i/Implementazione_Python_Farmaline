@@ -1,17 +1,16 @@
-from dateutil.utils import today
-
+from classi.documenti.classe_scheda_tecninca import SchedaTecnica
+from classi.oggetti.classe_farmaco import Farmaco
 from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla_lunghezza, check_nascita
 from classi.documenti.classe_tesserino_professionale import TesserinoProfessionale
 from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
-from funzioni_generali.random_function import create_random_string
 from classi.oggetti.classe_ricetta import Ricetta
 from classi.oggetti.classe_ordine import Ordine
 from abc import ABC, abstractmethod
 from datetime import datetime, date
 from database.db import connection
+from dateutil.utils import today
 from sqlalchemy import text
 import pandas as pd
-import string
 
 
 class Persona (ABC) :
@@ -64,6 +63,10 @@ class Persona (ABC) :
 
             else:
                 print("opzione non valida riprovare")
+
+    @abstractmethod
+    def aggiungi_persona_a_db(self)-> None:
+        ...
 
 class ProfiloUtente(ABC):
 
@@ -212,12 +215,10 @@ class ProfilolavoratoreSanitario(ProfiloUtente) :
 class ProfiloCliente(ProfiloUtente) :
 
     ordine : Ordine
-    ricetta: Ricetta
 
     def __init__(self, nome: str, password: str, id_u: str, tipo_p: str):
         super().__init__(nome,password,id_u,tipo_p)
         self.ordine=Ordine()
-        self.ricetta= Ricetta(self.id_utente)
 
     def aggiunta_profilo_utente_a_db(self) -> None:
 
@@ -256,7 +257,7 @@ class ProfiloCliente(ProfiloUtente) :
 
             filters: list[str] = []
 
-            if indicazioni_terapeutiche:#todo cosa significa questo if?
+            if indicazioni_terapeutiche:
                 filters.append(f"LOWER(s.indicazioni_terapeutiche) LIKE LOWER ('%{indicazioni_terapeutiche}%')")
 
             if composizione:
@@ -318,7 +319,7 @@ class ProfiloCliente(ProfiloUtente) :
                     JOIN SchedaTecnica AS s
                       ON f.codice = s.codice
                         WHERE LOWER(TRIM(f.nome)) LIKE LOWER('%{medicinale}%') -- TRIM dà più tolleranza sugli spazi 
-                                """# todo trim va lasciato ?
+                                """
             results = pd.read_sql(query, connection)
 
         else:
@@ -337,7 +338,7 @@ class ProfiloCliente(ProfiloUtente) :
 
     def scelta_indirizzi(self) -> None:
 
-        controllo_ricetta: int = self.ricetta.verifica_dati_ricetta(self.ordine.carrello, self.ordine.quanto_compro)
+        controllo_ricetta: int = Ricetta.verifica_dati_ricetta(self.ordine.carrello, self.ordine.quanto_compro, self.id_utente)
 
         if len(self.ordine.carrello) > 0 :
 
@@ -436,7 +437,7 @@ class ProfiloCliente(ProfiloUtente) :
                     self.ordine.update_database(self.id_utente)
 
             elif metodo == "2":
-                print("operazione andata a buon fine")
+                print("Operazione andata a buon fine")
                 self.ordine.associa_numero_ordine(indirizzo, self.id_utente)
                 self.ordine.update_database(self.id_utente)
 
@@ -459,7 +460,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
         print("RICERCA ORDINE NEL DATABASE")
 
-        cod_fisc = check_se_vuoto("Inserire il codice fiscale del cliente : ")
+        cod_fisc = controlla_lunghezza("Inserire il codice fiscale del cliente( es. RSSMRA00A01H501C ) : ", 16 )
         n_ordine = check_se_vuoto("Inserire il numero dell'ordine : ")
 
         query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo = 'Via Univeristà di Santa Marta, 26' "
@@ -468,7 +469,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
         while trovato.empty:
 
             print(f"Ordine non trovato, riprovare (tentativi rimasti {count}")
-            cod_fisc = check_se_vuoto("Inserire il codice fiscale del cliente : ")
+            cod_fisc = controlla_lunghezza("Inserire il codice fiscale del cliente ( es. RSSMRA00A01H501C )  : ", 16)
             n_ordine = check_se_vuoto("Inserire il numero dell'ordine : ")
 
             query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo = 'Via Univeristà di Santa Marta, 26' "
@@ -492,10 +493,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
     @staticmethod
     def aggiorna_magazzino() -> None:
 
-        scelta_op: str
         controllo_scelta: bool = False
-        continua: str = "1"
-        new_quantity: int
 
         query = "SELECT codice, nome, quantità FROM FarmaciMagazzino WHERE quantità <= 2 "
         riordinare = pd.read_sql(query, connection)
@@ -509,59 +507,58 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
             return None
 
         while not controllo_scelta:
-            print("Se si vuole aggiornare le quantità dei farmaci sopra elencati digitare 1")
-            print("Per procedere con altre operazioni digitare 2")
+
+            scelta_op: str
+
+            print("Diditare 1 se si vuole aggiornare le quantità dei farmaci sopra elencati digitare")
+            print("Digiatre 2 per procedere con altre operazioni")
             scelta_op = input()
 
-            if scelta_op == "1":
+            while scelta_op == "1":
 
-                controllo_scelta = True
+                new_quantity: int = 0
+                cod = input("Inserire il codice del farmaco che si vuole aggiornare : ")
 
-                while continua == "1":
-                    new_quantity = 0
-                    cod = input("Inserire il codice del farmaco che si vuole aggiornare : ")
+                query = f"SELECT codice FROM FarmaciMagazzino WHERE codice = '{cod}' AND quantità <= 2 "
+                ricerca = pd.read_sql(query, connection)
 
-                    query = f"SELECT codice FROM FarmaciMagazzino WHERE codice = '{cod}' AND quantità <= 2 "
-                    ricerca = pd.read_sql(query, connection)
+                if not ricerca.empty:
 
-                    if not ricerca.empty:
-                        while new_quantity <= 0:
-                            try:
-                                new_quantity = int(input("Inserire la quantità aggiornata : "))
-                            except ValueError:
-                                print("Il valore inserito non è compatibile, riprovare ")
+                    while new_quantity <= 0:
+                        try:
+                            new_quantity = int(input("Inserire la quantità aggiornata : "))
+                        except ValueError:
+                            print("Il valore inserito non è compatibile, riprovare ")
 
-                            if new_quantity <= 0:
-                                print("Il parametro non può assumere valore negativo o nullo")
+                        if new_quantity <= 0:
+                            print("Il parametro non può assumere valore negativo o nullo")
 
-                        query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice = '{cod}'"
-                        connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
-                        connection.commit()
+                    query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice = '{cod}'"
+                    connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
+                    connection.commit()
 
-                        query = "SELECT codice, nome, quantità FROM FarmaciMagazzino WHERE quantità <= 2 "
-                        new_elenco = pd.read_sql(query, connection)
+                    query = "SELECT codice, nome, quantità FROM FarmaciMagazzino WHERE quantità <= 2 "
+                    new_elenco = pd.read_sql(query, connection)
 
-                        if not new_elenco.empty:
-                            print("ELENCO AGGIORNATO")
-                            for farmaco in new_elenco.to_dict(orient="records"):
-                                print(farmaco)
-                        else:
-                            return None
-
-                        print("Se si desidera continuare ad aggiornare le quantità digitare 1 ")
-                        print("Per procedere con altre operazioni digitare 2 ")
-                        continua = input()
-
-                        if continua!= '2':
-                            print("operazione non valida, riprovare")
-                            continua = "1"
-
-
+                    if not new_elenco.empty:
+                        print("ELENCO AGGIORNATO")
+                        for farmaco in new_elenco.to_dict(orient="records"):
+                            print(farmaco)
                     else:
-                        print("Il codice inserito non è presente nella lista fornita , riprovare ")
-                        continua = "1"
+                        return None
 
-            elif scelta_op == "2":
+                    print("Digitare 1 se si desidera continuare ad aggiornare le quantità")
+                    print("Digitare 2 per procedere con altre operazioni")
+                    scelta_op = input()
+
+                    if scelta_op == '2' :
+                        return None
+
+                else:
+                    print("Il codice inserito non è presente nella lista fornita , riprovare ")
+                    scelta_op = "1"
+
+            if scelta_op == "2":
                 return None
 
             else:
@@ -570,13 +567,6 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
     @staticmethod
     def aggiunta_farmaci() -> None:
-
-        ck: bool = False
-        nome: str
-        ricetta: str
-        preparato_galenico: str
-        quanto: int = 0
-        prezzo: float = 0.0
 
         print("Per aggiungere una nuova tipologia di medicinale in magazzino, seguire le istruzioni di seguito riportate ")
 
@@ -589,90 +579,16 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
         else :
             cod = str(int(cod) + 1)
 
-        nome = check_se_vuoto("Inserire il nome del farmaco : ")
-        ricetta = check_se_vuoto("Il farmaco necessita di ricetta ? (digitare si o no) : ")
-        preparato_galenico = check_se_vuoto("È un preparato galenico ? (digitare si o no) : ")
+        new_farmaco = Farmaco(cod)
+        new_scheda = SchedaTecnica()
 
-        while quanto <= 0:
-            try:
-                quanto = int(input("Inserire la quantità di farmaco che si vuole aggiungere in magazzino : "))
-            except ValueError:
-                print("Il valore inserito non è compatibile, riprovare")
-            if quanto <= 0:
-                print("Il parametro non può assumere valore negativo o nullo")
-
-        while not ck:
-            try:
-                prezzo = float(input("Inserire il prezzo del prodotto in euro ( 0.00 ): "))
-                ck = True
-            except ValueError:
-                print("Il valore inserito non è compatibile, riprovare")
-
-        indicazioni_terapeutiche = check_se_vuoto(" Inserire le idicazioni terapeutiche : ")
-        composizione = check_se_vuoto("Inserire i componenti del farmaco : ")
-        eccipienti = check_se_vuoto("Inserire gli eccipienti del farmaco : ")
-        controindicazioni = check_se_vuoto("Inserire le controindicazioni : ")
-        posologia = check_se_vuoto("Inserire la posologia : ")
-        avvertenze = check_se_vuoto("Inserire le avvertenze : ")
-        effetti_indesiderati = check_se_vuoto("Inserire gli effetti indesiderati : ")
-
-
-        # sezione per aggiornare la tabella di SchedaTecnica sul database
-        new_scheda = pd.DataFrame(
-            [[
-                cod,
-                indicazioni_terapeutiche,
-                composizione,
-                eccipienti,
-                controindicazioni,
-                posologia,
-                avvertenze,
-                effetti_indesiderati
-            ]],
-            columns=[
-                'codice',  # <-- niente spazio finale
-                'indicazioni_terapeutiche',
-                'composizione',
-                'eccipienti',
-                'controindicazioni',
-                'posologia',
-                'avvertenze',
-                'effetti_indesiderati'
-            ]
-        )
-        new_scheda.to_sql('SchedaTecnica', connection, if_exists='append', index=False)
-
-        # sezione per aggiornare la tabella di FarmaciMagazzino sul database
-        new_farmaco = pd.DataFrame(
-            [[
-                nome,
-                ricetta,
-                preparato_galenico,
-                prezzo,
-                quanto,
-                cod
-            ]],
-            columns=[
-                'nome',  # <-- niente spazio finale
-                'ricetta',
-                'preparato_galenico',
-                'prezzo',
-                'quantità',
-                'codice'
-            ]
-        )
-        new_farmaco.to_sql('FarmaciMagazzino', connection, if_exists='append', index=False)
-
-        connection.commit()
+        new_scheda.aggiungi_scheda_a_db(cod)
+        new_farmaco.aggiungi_farmaco_a_db()
 
 class ProfiloMedico(ProfilolavoratoreSanitario) :
 
     @staticmethod
-    def crea_ricetta() -> None: #funzione medico
-
-        ck_cod: bool= False
-        cod: str
-        i: int
+    def crea_ricetta() -> None:
 
         print("Digitare il codice del farmaco che si vuole prescrivere, selezionando dal segunete elenco ")
 
@@ -680,6 +596,9 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
         elenco = pd.read_sql(query, connection)
 
         if not elenco.empty:
+
+            ck_cod: bool = False
+
             for farmaco in elenco.to_dict(orient="records"):
                 print(farmaco)
 
@@ -692,27 +611,10 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
                 if not farma.empty:
                     cod_fisc = controlla_lunghezza("Inserire il codice fiscale del paziente a cui si sta prescrivendo il farmaco : ", 16)
 
-                    cod_ricetta = ((create_random_string(4, string.digits)
-                                   + create_random_string(1, string.ascii_uppercase))
-                                   + ' '
-                                   + create_random_string(10, string.digits))
+                    new_ricetta = Ricetta(cod_fisc, cod_farmaco)
+                    new_ricetta.aggiungi_ricetta_a_db()
 
-                    new_ricetta = pd.DataFrame(
-                        [[
-                            cod_ricetta,
-                            cod_fisc,
-                            cod_farmaco
-                        ]],
-                        columns=[
-                            'codice_ricetta',  # <-- niente spazio finale
-                            'codice_fiscale',
-                            'codice_farmaco',
-                        ]
-                    )
-                    new_ricetta.to_sql('Ricetta', connection, if_exists='append', index=False)
-                    connection.commit()
-
-                    print(f"Fornire il seguente codice al paziente , CODICE RICETTA : {cod_ricetta}")
+                    print(f"Fornire il seguente codice al paziente , CODICE RICETTA : {new_ricetta.codice_ricetta}")
                     ck_cod=True
 
                 else:
@@ -733,17 +635,17 @@ class LavoratoreSanitario (Persona) :#classe base
 
     def iscriversi(self) -> bool:
 
-        ck_scelta: bool = False
         query = f"SELECT * FROM Sanitari WHERE matricola = '{self.t_p.n_matricola}'"
         lav_sani = pd.read_sql(query, connection)
 
         # si definisce la ricerca da database per controllare se la persona è già registrata
-        if not lav_sani.empty:  # è un dataframe
+        if not lav_sani.empty: # è un dataframe
+            ck_scelta: bool = False
             print("La matricola inserita appartiene a un utente già registrato")
 
             while not ck_scelta:
-                print("Se si vuole accedere al servizio digitare 1")
-                print("Se si vuole ritentare il processo di iscrizione digitare 2")
+                print("Digitare 1 se si vuole accedere al servizio")
+                print("Digitare 2 se si vuole ritentare il processo di iscrizione")
                 print("Digitare exit se si vuole terminare l'operazione")
                 scelta = check_se_vuoto("")
 
@@ -759,16 +661,7 @@ class LavoratoreSanitario (Persona) :#classe base
                     ck_scelta= False
 
         else:
-            self.t_p.associazione_tessera_a_db()
-            new_lav_sani = pd.DataFrame(
-                columns=['nome', 'cognome', 'professione', 'matricola'],
-                data=[
-                    [self.nome, self.cognome, self.t_p.ordine_di_appartenenza, self.t_p.n_matricola]
-                ]
-            )
-            new_lav_sani.to_sql('Sanitari', connection, if_exists='append', index=False)
-            connection.commit()
-
+            self.aggiungi_persona_a_db()
             # sezione per associazione profilo utente
             return self.crea_profilo()
 
@@ -780,18 +673,37 @@ class LavoratoreSanitario (Persona) :#classe base
 
         profilo = ProfilolavoratoreSanitario(nome, password, self.t_p.n_matricola, self.t_p.ordine_di_appartenenza)
 
-        ck = profilo.controllo_nome_utente()
+        ck_profilo = profilo.controllo_nome_utente()
 
-        while not ck:  # questo nuovo
+        while not ck_profilo:
             nuovo_nome = check_se_vuoto("Inserisci un altro nome utente: ")
             profilo.nome_utente = nuovo_nome
-            ck = profilo.controllo_nome_utente()
+            ck_profilo = profilo.controllo_nome_utente()
 
         profilo.aggiunta_profilo_utente_a_db()
 
         print("registrazione effettuata con successo.")
         print(f"        Benvenuto {profilo.nome_utente} !")
         return True
+
+    def aggiungi_persona_a_db(self)-> None:
+
+        self.t_p.aggiunta_tessera_a_db()
+        new_lav_sani = pd.DataFrame(
+            columns=[
+                'nome',
+                'cognome',
+                'professione',
+                'matricola'],
+            data=[
+                self.nome,
+                self.cognome,
+                self.t_p.ordine_di_appartenenza,
+                self.t_p.n_matricola
+            ]
+        )
+        new_lav_sani.to_sql('Sanitari', connection, if_exists='append', index=False)
+        connection.commit()
 
 class Cliente(Persona):
     t_s: TesseraSanitaria #t_s abbreviazione tessera sanitaria
@@ -809,13 +721,15 @@ class Cliente(Persona):
 
 
         if ck_data and self.t_s.data_nascita != date.today()  :
+
             #per verificare che il codice inserito non appartenga a un'altra tessera sanitaria
+
             query = f"SELECT * FROM Clienti WHERE codice_fiscale = '{self.t_s.codice_fiscale}'"
             cliente = pd.read_sql(query, connection)
             if not cliente.empty: # è un dataframe
                 print("Il codice fiscale inserito appartiene a un utente già registrato")
-                print("Se si vuole accedere al servizio digitare 1")
-                print("Se si vuole ritentare il processo di iscrizione digitare 2")
+                print("Digitare 1 se si vuole accedere al servizio ")
+                print("Digitare 2 se si vuole ritentare il processo di iscrizione")
                 print("Digitare exit se si vuole terminare l'operazione")
                 scelta = input()
 
@@ -828,16 +742,7 @@ class Cliente(Persona):
                     return False
 
             else:
-                self.t_s.associazione_tessera_a_db()
-                new_cliente = pd.DataFrame(
-                    columns=['nome','cognome','codice_fiscale'],
-                    data=[
-                    [self.nome, self.cognome, self.t_s.codice_fiscale ]
-                    ]
-                )
-                new_cliente.to_sql('Clienti', connection, if_exists='append', index=False)
-                connection.commit()
-                #sezione per associazione profilo utente
+                self.aggiungi_persona_a_db()
                 return self.crea_profilo()
         else:
             print("La tessera risulta scaduta o la data di nascita non è valida, non è possibile effettuare l'iscrizione al servizio")
@@ -849,12 +754,12 @@ class Cliente(Persona):
         nome = check_se_vuoto(" inserire un nome utente : ")  # inserire controllo per corrispondenza profilo utente
         password = check_se_vuoto(" inserire una password : ")
         profilo = ProfiloCliente(nome, password, self.t_s.codice_fiscale, 'cliente')
-        ck = profilo.controllo_nome_utente()
+        ck_profilo = profilo.controllo_nome_utente()
 
-        while not ck:  # questo nuovo
+        while not ck_profilo:
             nuovo_nome = check_se_vuoto("Inserisci un altro nome utente: ")
             profilo.nome_utente = nuovo_nome
-            ck = profilo.controllo_nome_utente()
+            ck_profile = profilo.controllo_nome_utente()
 
         profilo.aggiunta_profilo_utente_a_db()
 
@@ -862,3 +767,21 @@ class Cliente(Persona):
         print(f"        Benvenuto {profilo.nome_utente} !")
         return True
 
+    def aggiungi_persona_a_db(self)->None:
+
+        self.t_s.aggiunta_tessera_a_db()
+
+        new_cliente = pd.DataFrame(
+            columns=[
+                'nome',
+                'cognome',
+                'codice_fiscale'
+            ],
+            data=[
+                self.nome,
+                self.cognome,
+                self.t_s.codice_fiscale
+            ]
+        )
+        new_cliente.to_sql('Clienti', connection, if_exists='append', index=False)
+        connection.commit()

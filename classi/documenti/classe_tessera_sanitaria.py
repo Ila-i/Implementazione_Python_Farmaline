@@ -44,7 +44,7 @@ class TesseraSanitaria :
                 ck_d=False
         self.numero_identificazione_tessera = controlla_lunghezza(" NUMERO IDENTIFICAZIONE TESSERA (es. 12345678901234567890 ): ", 20)# sulla tessera sanitaria fisica sono 20 caratteri alfanumerici
 
-    def associazione_tessera_a_db(self)->None:
+    def aggiunta_tessera_a_db(self)->None:
 
         new_tessera = pd.DataFrame(
             columns=[

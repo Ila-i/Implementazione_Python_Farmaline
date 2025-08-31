@@ -1,23 +1,31 @@
-from sqlalchemy import text
-
+from funzioni_generali.random_function import create_random_string
 from database.db import connection
+from sqlalchemy import text
 import pandas as pd
-
+import string
 
 
 
 class Ricetta :
+
+    codice_ricetta : str
     id_utente :str
+    codice_farmaco : str
 
-    def __init__(self, id_u):
+    def __init__(self, id_u :str , cod_farmaco :str):
         self.id_utente = id_u
+        self.codice_faramco = cod_farmaco
+        self.codice_ricetta = ((create_random_string(4, string.digits)
+                                + create_random_string(1, string.ascii_uppercase))
+                                + ' '
+                                + create_random_string(10, string.digits))
 
-    def verifica_dati_ricetta(self, carrello : list[dict], quantity: dict) -> int:
+    @classmethod
+    def verifica_dati_ricetta( cls, carrello : list[dict], quantity: dict, cod_fisc :str) -> int:
 
         count: int = 0
         nome_farma : str
         verifica_cod : bool = False
-        ck: bool = False
 
         for prodotto in carrello:
             #si ricerca tra i prodotti nel carrello quelli che necessitano di ricetta
@@ -29,7 +37,7 @@ class Ricetta :
             if not serve_ricetta.empty:
 
                 # controllo se l'utente è in possesso della ricetta per acquistare il farmaco
-                query = f" SELECT codice_ricetta, codice_farmaco , nome_medico FROM Ricetta WHERE codice_farmaco ='{codice_val}' AND codice_fiscale = '{self.id_utente}'"
+                query = f" SELECT codice_ricetta, codice_farmaco , nome_medico FROM Ricetta WHERE codice_farmaco ='{codice_val}' AND codice_fiscale = '{cod_fisc}'"
                 ricetta_ck = pd.read_sql_query(query, connection)
 
                 if ricetta_ck.empty:
@@ -58,7 +66,7 @@ class Ricetta :
                                 for ricetta in ricetta_ck.to_dict(orient="records"):
                                     if codice_input == ricetta["codice_ricetta"]:
                                         verifica_cod = True
-                                        query = (f"DELETE FROM Ricetta WHERE codice_ricetta = '{codice_input}'")
+                                        query = f"DELETE FROM Ricetta WHERE codice_ricetta = '{codice_input}'"
                                         connection.execute(text(query))
                                         connection.commit()
                                         ck=True
@@ -83,6 +91,21 @@ class Ricetta :
 
         return count
 
+    def aggiungi_ricetta_a_db(self)->None:
 
+        ricetta = pd.DataFrame(
+            columns=[
+                'codice_ricetta',
+                'codice_fiscale',
+                'codice_farmaco',
+            ],
+            data=[
+                    self.codice_ricetta,
+                    self.id_utente,
+                    self.codice_farmaco
+                ],
+        )
+        ricetta.to_sql('Ricetta', connection, if_exists='append', index=False)
+        connection.commit()
 
 
