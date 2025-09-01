@@ -12,7 +12,7 @@ class SchedaTecnica :
     avvertenze : str
     effetti_indesiderati : str
 
-    def __init__(self):
+    def __init__(self)->None:
         self.indicazioni_terapeutiche = check_se_vuoto(" Inserire le idicazioni terapeutiche : ")
         self.composizione = check_se_vuoto("Inserire i componenti del farmaco : ")
         self.eccipienti = check_se_vuoto("Inserire gli eccipienti del farmaco : ")

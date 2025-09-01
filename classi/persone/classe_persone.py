@@ -16,7 +16,7 @@ class Persona (ABC) :
     nome: str
     cognome: str
 
-    def __init__(self):
+    def __init__(self)->None:
         self.nome = check_se_vuoto("Inserire il proprio nome : ")
         self.cognome = check_se_vuoto("Inserire il proprio cognome : ")
 
@@ -73,7 +73,7 @@ class ProfiloUtente(ABC):
     tipo_profilo: str
     id_utente :str
 
-    def __init__(self, nome : str, password :str, id_u : str , tipo_p : str):
+    def __init__(self, nome : str, password :str, id_u : str , tipo_p : str)-> None:
         self.nome_utente = nome
         self.password = password
         self.id_utente = id_u
@@ -216,7 +216,7 @@ class ProfiloCliente(ProfiloUtente) :
 
     ordine : Ordine
 
-    def __init__(self, nome: str, password: str, id_u: str, tipo_p: str):
+    def __init__(self, nome: str, password: str, id_u: str, tipo_p: str)->None:
         super().__init__(nome,password,id_u,tipo_p)
         self.ordine=Ordine()
 
@@ -435,12 +435,12 @@ class ProfiloCliente(ProfiloUtente) :
                 else:
                     print("Operazione andata a buon fine")
                     self.ordine.associa_numero_ordine(indirizzo, self.id_utente)
-                    self.ordine.update_database(self.id_utente)
+                    self.ordine.update_quantity(self.id_utente)
 
             elif metodo == "2":
                 print("Operazione andata a buon fine")
                 self.ordine.associa_numero_ordine(indirizzo, self.id_utente)
-                self.ordine.update_database(self.id_utente)
+                self.ordine.update_quantity(self.id_utente)
 
             else :
                 print("Opzione non valida")
@@ -627,7 +627,7 @@ class LavoratoreSanitario (Persona) :#classe base
 
     t_p: TesserinoProfessionale  # t_p abbreviazione tesserino professionale
 
-    def __init__(self, tipo_p :str ):
+    def __init__(self, tipo_p :str )->None:
         super().__init__()
         self.t_p = TesserinoProfessionale(tipo_p)
 
@@ -706,7 +706,7 @@ class LavoratoreSanitario (Persona) :#classe base
 class Cliente(Persona):
     t_s: TesseraSanitaria #t_s abbreviazione tessera sanitaria
 
-    def __init__(self):
+    def __init__(self)->None:
         super().__init__()
         self.t_s = TesseraSanitaria()
 

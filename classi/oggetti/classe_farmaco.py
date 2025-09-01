@@ -13,7 +13,7 @@ class Farmaco :
     codice_farmaco: str
     scheda_tecnica : SchedaTecnica
 
-    def __init__(self, codice:str):
+    def __init__(self, codice:str)->None:
 
         self.nome = check_se_vuoto("Inserire il nome del farmaco : ")
         self.serve_ricetta = check_se_vuoto("Il farmaco necessita di ricetta ? (digitare si o no) : ")

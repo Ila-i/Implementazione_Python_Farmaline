@@ -8,7 +8,7 @@ class TesserinoProfessionale :
     ordine_di_appartenenza: str # indica il settore lavorativo a cui appartieni
     n_matricola : str # indica il numero di iscrizione all'albo di riferimento
 
-    def __init__(self, ordine :str):
+    def __init__(self, ordine :str)->None:
         self.ordine_di_appartenenza = ordine
         self.n_matricola =check_se_vuoto("Inserire il proprio numero di matricola : ")
 

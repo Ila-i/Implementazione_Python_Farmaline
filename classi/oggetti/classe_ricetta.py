@@ -10,7 +10,7 @@ class Ricetta :
     id_utente :str
     codice_farmaco : str
 
-    def __init__(self, id_u :str , cod_farmaco :str):
+    def __init__(self, id_u :str , cod_farmaco :str)->None:
         self.id_utente = id_u
         self.codice_farmaco = cod_farmaco
         #per assegnare un codice nella forma 1234A 1234567890 alle ricette
