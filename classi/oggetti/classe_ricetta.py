@@ -12,7 +12,7 @@ class Ricetta :
 
     def __init__(self, id_u :str , cod_farmaco :str):
         self.id_utente = id_u
-        self.codice_faramco = cod_farmaco
+        self.codice_farmaco = cod_farmaco
         #per assegnare un codice nella forma 1234A 1234567890 alle ricette
         self.codice_ricetta = ((create_random_string(4, string.digits)
                                 + create_random_string(1, string.ascii_uppercase))
@@ -105,11 +105,11 @@ class Ricetta :
                 'codice_fiscale',
                 'codice_farmaco',
             ],
-            data=[
+            data=[[
                     self.codice_ricetta,
                     self.id_utente,
                     self.codice_farmaco
-                ],
+                ]]
         )
         ricetta.to_sql('Ricetta', connection, if_exists='append', index=False)
         connection.commit()

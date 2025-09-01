@@ -97,7 +97,7 @@ if isinstance( profilo , ProfiloUtente) :
                 print("Digitare 1 se si desidera aggiungere nuovi farmaci al magazzino")
                 print("Digitare 2 per verificare l'esistenza di un altro ordine e confermare l'avvenuta consegna")
                 print("Digitare exit per terminare le operazioni")
-                opzioni = input()
+                opzioni_f = input()
 
             if opzioni_f == "exit" :
                 ck_f = True

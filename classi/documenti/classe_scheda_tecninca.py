@@ -24,6 +24,16 @@ class SchedaTecnica :
     def aggiungi_scheda_a_db(self, cod :str )->None:
 
         scheda = pd.DataFrame(
+            data=[[
+                cod,
+                self.indicazioni_terapeutiche,
+                self.composizione,
+                self.eccipienti,
+                self.controindicazioni,
+                self.posologia,
+                self.avvertenze,
+                self.effetti_indesiderati,
+            ]],
             columns=[
                 'codice_farmaco',
                 'indicazioni_terapeutiche',
@@ -33,17 +43,8 @@ class SchedaTecnica :
                 'posologia',
                 'avvertenze',
                 'effetti_indesiderati',
-            ],
-            data = [
-                cod,
-                self.indicazioni_terapeutiche,
-                self.composizione,
-                self.eccipienti,
-                self.controindicazioni,
-                self.posologia,
-                self.avvertenze,
-                self.effetti_indesiderati,
             ]
         )
+
         scheda.to_sql('SchedaTecnica', connection, if_exists='append', index=False)
         connection.commit()

@@ -48,21 +48,21 @@ class Farmaco :
 
         farmaco = pd.DataFrame(
             columns=[
-                'nome',  # <-- niente spazio finale
+                'nome',
                 'serve_ricetta',
                 'preparato_galenico',
                 'prezzo',
                 'quantità',
-                'codice'
+                'codice_farmaco',
             ],
-            data=[
+            data=[[
                 self.nome,
                 self.serve_ricetta,
                 self.preparato_galenico,
                 self.prezzo,
                 self.quantity,
-                self.codice_farmaco
-            ]
+                self.codice_farmaco,
+            ]]
         )
         farmaco.to_sql('FarmaciMagazzino', connection, if_exists='append', index=False)
         connection.commit()

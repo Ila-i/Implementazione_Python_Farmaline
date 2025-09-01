@@ -463,7 +463,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
         cod_fisc = controlla_lunghezza("Inserire il codice fiscale del cliente( es. RSSMRA00A01H501C ) : ", 16 )
         n_ordine = check_se_vuoto("Inserire il numero dell'ordine : ")
 
-        query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo = 'Via Univeristà di Santa Marta, 26' "
+        query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Univeristà di Santa Marta, 26' "
         trovato = pd.read_sql(query, connection)
 
         while trovato.empty:
@@ -472,7 +472,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
             cod_fisc = controlla_lunghezza("Inserire il codice fiscale del cliente ( es. RSSMRA00A01H501C )  : ", 16)
             n_ordine = check_se_vuoto("Inserire il numero dell'ordine : ")
 
-            query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo = 'Via Univeristà di Santa Marta, 26' "
+            query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Univeristà di Santa Marta, 26' "
             trovato = pd.read_sql(query, connection)
             count -= 1
 
@@ -483,7 +483,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
         if count > 0:
             print("Ordine trovato")
             print(str(trovato.iloc[0]))
-            query = f"DELETE FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo = 'Via Univeristà di Santa Marta, 26' "
+            query = f"DELETE FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Univeristà di Santa Marta, 26' "
             connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
             connection.commit()
             print("Ordine rimosso dal database")
@@ -570,7 +570,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
         print("Per aggiungere una nuova tipologia di medicinale in magazzino, seguire le istruzioni di seguito riportate ")
 
-        query = "SELECT MAX(codice_farmaco) FROM FarmaciMagazzino"
+        query = "SELECT MAX(codice_farmaco) FROM SchedaTecnica"
         cod = pd.read_sql(query, connection)
         cod = str(cod.iloc[0, 0])
 
