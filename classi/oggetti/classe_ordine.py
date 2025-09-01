@@ -19,7 +19,7 @@ class Ordine :
         prodotto = self.controllo_prodotto(results)
 
         #controlla che la quantità che si vuole acquistare non sia superiore a quella disponibile in magazzino
-        query = f"SELECT quantità FROM FarmaciMagazzino WHERE quantità < '{prodotto["quantità"]}' AND codice = '{prodotto["codice"]}' "
+        query = f"SELECT quantità FROM FarmaciMagazzino WHERE quantità < '{prodotto["quantità"]}' AND codice_farmaco = '{prodotto["codice"]}' "
         q_trovata = pd.read_sql(query, connection)
 
 
@@ -87,7 +87,7 @@ class Ordine :
             columns=[
                 'numero_ordine',  # <-- niente spazio finale
                 'codice_fiscale',
-                'indirizzo',
+                'indirizzo_consegna',
             ]
         )
         new_ordine.to_sql('Ordine', connection, if_exists='append', index=False)
@@ -107,7 +107,7 @@ class Ordine :
 
             # si modifica la quantità di prodotto in magazzino
             new_quantity = prodotto["quantità"] - self.quanto_compro[prodotto["codice_farmaco"]]
-            query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice = '{prodotto["codice_farmaco"]}' "
+            query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice_farmaco = '{prodotto["codice_farmaco"]}' "
             connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
             connection.commit()
 

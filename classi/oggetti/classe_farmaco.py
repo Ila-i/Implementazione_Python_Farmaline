@@ -49,13 +49,13 @@ class Farmaco :
         farmaco = pd.DataFrame(
             columns=[
                 'nome',  # <-- niente spazio finale
-                'ricetta',
+                'serve_ricetta',
                 'preparato_galenico',
                 'prezzo',
                 'quantità',
                 'codice'
             ],
-            data = [
+            data=[
                 self.nome,
                 self.serve_ricetta,
                 self.preparato_galenico,

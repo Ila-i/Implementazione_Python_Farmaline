@@ -268,9 +268,9 @@ class ProfiloCliente(ProfiloUtente) :
             query = """
                     SELECT 
 
-                        f.codice AS codice_farmaco,      -- alias univoco
+                        f.codice_farmaco 
                         f.nome,
-                        f.ricetta,
+                        f.serve_ricetta,
                         f.preparato_galenico,
                         f.prezzo,
                         f.quantità,
@@ -283,7 +283,7 @@ class ProfiloCliente(ProfiloUtente) :
                         s.effetti_indesiderati
                     FROM FarmaciMagazzino AS f
                     JOIN SchedaTecnica AS s
-                      ON f.codice = s.codice 
+                      ON f.codice_farmaco = s.codice_farmaco 
                     """
 
             if filters:
@@ -301,9 +301,9 @@ class ProfiloCliente(ProfiloUtente) :
 
             query = f"""
                     SELECT
-                        f.codice AS codice_farmaco,      -- alias univoco
+                        f.codice_farmaco,      -- alias univoco
                         f.nome,
-                        f.ricetta,
+                        f.serve_ricetta,
                         f.preparato_galenico,
                         f.prezzo,
                         f.quantità,
@@ -316,7 +316,7 @@ class ProfiloCliente(ProfiloUtente) :
                         s.effetti_indesiderati
                     FROM FarmaciMagazzino AS f
                     JOIN SchedaTecnica AS s
-                      ON f.codice = s.codice
+                      ON f.codice_farmaco = s.codice_farmaco
                         WHERE LOWER(TRIM(f.nome)) LIKE LOWER('%{medicinale}%') -- TRIM dà più tolleranza sugli spazi 
                                 """
             results = pd.read_sql(query, connection)
@@ -495,7 +495,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
         controllo_scelta: bool = False
 
-        query = "SELECT codice, nome, quantità FROM FarmaciMagazzino WHERE quantità <= 2 "
+        query = "SELECT codice_farmaco, nome, quantità FROM FarmaciMagazzino WHERE quantità <= 2 "
         riordinare = pd.read_sql(query, connection)
 
         if not riordinare.empty:
@@ -519,7 +519,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
                 new_quantity: int = 0
                 cod = input("Inserire il codice del farmaco che si vuole aggiornare : ")
 
-                query = f"SELECT codice FROM FarmaciMagazzino WHERE codice = '{cod}' AND quantità <= 2 "
+                query = f"SELECT codice_farmaco FROM FarmaciMagazzino WHERE codice_farmaco = '{cod}' AND quantità <= 2 "
                 ricerca = pd.read_sql(query, connection)
 
                 if not ricerca.empty:
@@ -533,11 +533,11 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
                         if new_quantity <= 0:
                             print("Il parametro non può assumere valore negativo o nullo")
 
-                    query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice = '{cod}'"
+                    query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice_farmaco = '{cod}'"
                     connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
                     connection.commit()
 
-                    query = "SELECT codice, nome, quantità FROM FarmaciMagazzino WHERE quantità <= 2 "
+                    query = "SELECT codice_farmaco, nome, quantità FROM FarmaciMagazzino WHERE quantità <= 2 "
                     new_elenco = pd.read_sql(query, connection)
 
                     if not new_elenco.empty:
@@ -570,7 +570,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
         print("Per aggiungere una nuova tipologia di medicinale in magazzino, seguire le istruzioni di seguito riportate ")
 
-        query = "SELECT MAX(codice) FROM FarmaciMagazzino"
+        query = "SELECT MAX(codice_farmaco) FROM FarmaciMagazzino"
         cod = pd.read_sql(query, connection)
         cod = str(cod.iloc[0, 0])
 
@@ -589,7 +589,7 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
 
         print("Digitare il codice del farmaco che si vuole prescrivere, selezionando dal segunete elenco ")
 
-        query = "SELECT codice , nome FROM FarmaciMagazzino WHERE ricetta = 'si' "
+        query = "SELECT codice_farmaco , nome FROM FarmaciMagazzino WHERE serve_ricetta = 'si' "
         elenco = pd.read_sql(query, connection)
 
         if not elenco.empty:
@@ -602,7 +602,7 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
             while not ck_cod:
 
                 cod_farmaco = input()
-                query = f"SELECT nome FROM FarmaciMagazzino WHERE codice='{cod_farmaco}' AND ricetta = 'si'"
+                query = f"SELECT nome FROM FarmaciMagazzino WHERE codice_farmaco='{cod_farmaco}' AND serve_ricetta = 'si'"
                 farma = pd.read_sql(query, connection)
 
                 if not farma.empty:

@@ -17,7 +17,7 @@ class TesserinoProfessionale :
         new_tesserino = pd.DataFrame(
             columns=[
                 'ordine_appartenenza',
-                'n_matricola'
+                'matricola'
             ],
             data=[
                 self.ordine_di_appartenenza,

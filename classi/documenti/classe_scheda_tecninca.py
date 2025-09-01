@@ -19,22 +19,22 @@ class SchedaTecnica :
         self.controindicazioni = check_se_vuoto("Inserire le controindicazioni : ")
         self.posologia = check_se_vuoto("Inserire la posologia : ")
         self.avvertenze = check_se_vuoto("Inserire le avvertenze : ")
-        self.ffetti_indesiderati = check_se_vuoto("Inserire gli effetti indesiderati : ")
+        self.effetti_indesiderati = check_se_vuoto("Inserire gli effetti indesiderati : ")
 
     def aggiungi_scheda_a_db(self, cod :str )->None:
 
         scheda = pd.DataFrame(
             columns=[
-                'codice',  # <-- niente spazio finale
+                'codice_farmaco',
                 'indicazioni_terapeutiche',
                 'composizione',
                 'eccipienti',
                 'controindicazioni',
                 'posologia',
                 'avvertenze',
-                'effetti_indesiderati'
+                'effetti_indesiderati',
             ],
-            data =[
+            data = [
                 cod,
                 self.indicazioni_terapeutiche,
                 self.composizione,
@@ -42,9 +42,8 @@ class SchedaTecnica :
                 self.controindicazioni,
                 self.posologia,
                 self.avvertenze,
-                self.effetti_indesiderati
+                self.effetti_indesiderati,
             ]
-
         )
         scheda.to_sql('SchedaTecnica', connection, if_exists='append', index=False)
         connection.commit()

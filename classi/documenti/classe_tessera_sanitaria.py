@@ -83,7 +83,7 @@ class TesseraSanitaria :
 
         new_date : datetime.date = date.today()
 
-        query = f"SELECT data_scadenza FROM TesseraSanitaria WHERE codice_Fiscale= '{codice_f}'"
+        query = f"SELECT data_scadenza FROM TesseraSanitaria WHERE codice_fiscale= '{codice_f}'"
         data = pd.read_sql_query(query, connection)
         data_ck = data.iloc[0, 0]
         data_ck = datetime.strptime(data_ck, "%Y-%m-%d").date()
@@ -109,22 +109,13 @@ class TesseraSanitaria :
                         ck = False
 
                 #aggiorna la base dati
-                query = f"UPDATE TesseraSanitaria SET data_scadenza= '{new_date}' WHERE codice_Fiscale= '{codice_f}'"
+                query = f"UPDATE TesseraSanitaria SET data_scadenza= '{new_date}' WHERE codice_fiscale= '{codice_f}'"
                 connection.execute(text(query))
                 connection.commit()
 
             elif verifica == "no":
 
-                print("Il profilo verrà eliminato")
-                query = f"DELETE FROM TesseraSanitaria WHERE codice_Fiscale ='{codice_f}'"
-                connection.execute(text(query))
-                connection.commit()
-                query = f"DELETE FROM ProfiloUtente WHERE id_cliente = '{codice_f}'"
-                connection.execute(text(query))
-                connection.commit()
-                query = f"DELETE FROM Clienti WHERE  codice_fiscale = '{codice_f}'"
-                connection.execute(text(query))
-                connection.commit()
+                print("Il profilo sarà temporanemente sospeso fino a che non sarà aggiornata la tessera sanitaria")
                 return False
 
             else:

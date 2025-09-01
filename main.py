@@ -2,7 +2,7 @@ from classi.persone.classe_persone import ProfiloUtente, ProfiloCliente, Profilo
 from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
 from typing import Optional
 
-profilo : Optional[ProfiloUtente] #può appartenere alla classe ProfiloUtente o assumere valore None
+profilo : Optional[ProfiloUtente] = None #può appartenere alla classe ProfiloUtente o assumere valore None
 operazione : str # per registare la scelta dell'utente tra accedere e registrarsi
 
 print("HOME PAGE")

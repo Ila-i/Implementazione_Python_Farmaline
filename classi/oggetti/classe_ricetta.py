@@ -31,7 +31,7 @@ class Ricetta :
 
             codice_val = prodotto["codice_farmaco"]
             nome_farma = prodotto["nome"]
-            query = f" SELECT ricetta FROM FarmaciMagazzino WHERE codice = '{codice_val}' AND ricetta = 'si'"
+            query = f" SELECT serve_ricetta FROM FarmaciMagazzino WHERE codice_farmaco = '{codice_val}' AND serve_ricetta = 'si'"
             serve_ricetta = pd.read_sql_query(query, connection)  # può restituire la stringa "si" o rimanere vuoto
 
             # sezione dedicata al caso in cui il cliente sta acquistando farmaci che richiedono ricetta
