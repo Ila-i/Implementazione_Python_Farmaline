@@ -20,14 +20,6 @@ class Persona (ABC) :
         self.nome = check_se_vuoto("Inserire il proprio nome : ")
         self.cognome = check_se_vuoto("Inserire il proprio cognome : ")
 
-    @abstractmethod
-    def iscriversi(self) -> bool:
-        ...
-
-    @abstractmethod
-    def crea_profilo(self) ->bool:
-        ...
-
     @classmethod
     def registrazione_utente(cls) -> bool:
 
@@ -41,7 +33,6 @@ class Persona (ABC) :
         pearson: Persona
 
         while not verifica:
-
 
             print("Digitare 1 se si desidera iscriversi come cliente")
             print("Digitare 2 se si desidera iscriversi come farmacista")
@@ -64,6 +55,14 @@ class Persona (ABC) :
                 print("opzione non valida riprovare")
 
     @abstractmethod
+    def iscriversi(self) -> bool:
+        ...
+
+    @abstractmethod
+    def crea_profilo(self) ->bool:
+        ...
+
+    @abstractmethod
     def aggiungi_persona_a_db(self)-> None:
         ...
 
@@ -79,6 +78,61 @@ class ProfiloUtente(ABC):
         self.password = password
         self.id_utente = id_u
         self.tipo_profilo = tipo_p
+
+    @classmethod
+    def accesso_utente(cls) -> str:
+
+        """ Ritorna il nome utente quando l'operazione va a buon fine.
+        Ritorna 2 se si vuole passare al processo di registazione.
+        Ritorna exit per terminare le operazioni.
+        """
+        username: str
+        tentativi: int = 3
+
+        print("INSERIMENTO DATI PER ACCESSO")
+
+        # sezione dedicata al controllo del nome utente, si verifica se è presente nel database
+        username = check_se_vuoto("Inserire il proprio nome utente : ")
+        query = f"SELECT nome_utente, password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
+        profile_check = pd.read_sql(query, connection)
+
+        while profile_check.empty:
+
+            username = check_se_vuoto(
+                f" Il nome utente inserito non appartiente a un utente registarto, riprovare (tentativi rimasti {tentativi}): ")
+            query = f"SELECT nome_utente, password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
+            profile_check = pd.read_sql(query, connection)
+            tentativi -= 1
+
+            if tentativi == 0:
+                op: str  # abbreviazione per operazione
+                print(
+                    "Digitare 2 per iscriversi al servizio se non si è in possesso di un profilo utente già registrato")
+                print("Digitare exit se si vuole terminare le operazioni")
+                op = input()
+                return op
+
+        # sezione dedicata al controllo password, si esegue questa sezione solo quando viene trovato il nome utente nel database
+        if tentativi > 0:
+
+            pw: str  # pw abbrevviazione per password
+            tentativi = 3
+
+            pw = check_se_vuoto("Inserire la propria password : ")
+            pw_check = str(profile_check.iloc[0, 1])
+
+            while pw != pw_check:
+                tentativi -= 1
+                if tentativi > 0:
+                    pw = check_se_vuoto(
+                        f" La password inserita  per questo username è incorretta, riprovare (tentetivi rimasti {tentativi}): ")
+
+                elif tentativi == 0:
+                    print(f"La password inserita  per questo username è incorretta, tentativi rimasti {tentativi}")
+                    print(f"Operazione fallita")
+                    return "exit"
+
+        return username
 
     @abstractmethod
     def aggiunta_profilo_utente_a_db(self) -> None:
@@ -133,59 +187,6 @@ class ProfiloUtente(ABC):
         else:
             print("Operazione fallita")
             pass
-
-    @classmethod
-    def accesso_utente(cls) -> str:
-
-        """ Ritorna il nome utente quando l'operazione va a buon fine.
-        Ritorna 2 se si vuole passare al processo di registazione.
-        Ritorna exit per terminare le operazioni.
-        """
-        username: str
-        tentativi: int = 3
-
-        print("INSERIMENTO DATI PER ACCESSO")
-
-        # sezione dedicata al controllo del nome utente, si verifica se è presente nel database
-        username = check_se_vuoto("Inserire il proprio nome utente : ")
-        query = f"SELECT nome_utente, password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
-        profile_check = pd.read_sql(query, connection)
-
-        while profile_check.empty:
-
-            username = check_se_vuoto(f" Il nome utente inserito non appartiente a un utente registarto, riprovare (tentativi rimasti {tentativi}): ")
-            query = f"SELECT nome_utente, password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
-            profile_check = pd.read_sql(query, connection)
-            tentativi -= 1
-
-            if tentativi == 0:
-
-                op: str  # abbreviazione per operazione
-                print("Digitare 2 per iscriversi al servizio se non si è in possesso di un profilo utente già registrato")
-                print("Digitare exit se si vuole terminare le operazioni")
-                op = input()
-                return op
-
-        # sezione dedicata al controllo password, si esegue questa sezione solo quando viene trovato il nome utente nel database
-        if tentativi > 0:
-
-            pw: str  # pw abbrevviazione per password
-            tentativi = 3
-
-            pw = check_se_vuoto("Inserire la propria password : ")
-            pw_check = str(profile_check.iloc[0, 1])
-
-            while pw != pw_check:
-                tentativi -= 1
-                if tentativi > 0:
-                    pw = check_se_vuoto(f" La password inserita  per questo username è incorretta, riprovare (tentetivi rimasti {tentativi}): ")
-
-                elif tentativi == 0:
-                    print(f"La password inserita  per questo username è incorretta, tentativi rimasti {tentativi}")
-                    print(f"Operazione fallita")
-                    return "exit"
-
-        return username
 
 
 class ProfilolavoratoreSanitario(ProfiloUtente) :
