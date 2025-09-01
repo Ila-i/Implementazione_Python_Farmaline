@@ -14,7 +14,7 @@ class TesseraSanitaria :
     data_scadenza: datetime.date
     numero_identificazione_tessera: str
 
-    def __init__(self):
+    def __init__(self)->None:
 
         ck_d: bool =False # abbreviazione per check_data
 

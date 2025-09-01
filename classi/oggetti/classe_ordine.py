@@ -7,10 +7,12 @@ import random
 
 class Ordine :
 
+    codice_ordine : int
     carrello: list[dict]
     quanto_compro: dict
 
-    def __init__(self):
+    def __init__(self)->None:
+        self.codice_ordine = random.randint(0, 1000000000) # si associa un numero random come codice
         self.carrello = []
         self.quanto_compro = {}
 
@@ -69,18 +71,14 @@ class Ordine :
             else:
                 print("La quantità di farmaco in magazzino non è sufficiente, riprovare  ")
 
-    @staticmethod
-    def associa_numero_ordine(indirizzo: str, id_utente :str) -> None:
+    def associa_numero_ordine(self,indirizzo: str, id_utente :str) -> None:
 
-        num_ordine: int
-
-        num_ordine = random.randint(0, 1000000000)
-        print(f"Fornire il seguente codice al momento del ritiro : {num_ordine}")
+        print(f"Fornire il seguente codice al momento del ritiro : {self.codice_ordine}")
 
         # agginge il nuovo ordine al database
         new_ordine = pd.DataFrame(
             [[
-                num_ordine,
+                self.codice_ordine,
                 id_utente,
                 indirizzo,
             ]],
@@ -101,7 +99,9 @@ class Ordine :
             print(f" quantità : {self.quanto_compro[prodotto["codice_farmaco"]]} ")
             print(f" prezzo : {self.quanto_compro[prodotto["codice_farmaco"]] * float(prodotto["prezzo"])} €")
 
-    def update_database(self, id_utente :str)->None:
+    def update_quantity(self, id_utente :str)->None:
+
+        """Agisce sul database andando a modificare le quantità di prodotto aggiornate dal farmacista"""
 
         for prodotto in self.carrello:
 
