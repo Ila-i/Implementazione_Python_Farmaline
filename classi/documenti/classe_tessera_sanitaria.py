@@ -75,9 +75,9 @@ class TesseraSanitaria :
     @classmethod
     def check_se_ancora_valida(cls, codice_f: str )->bool:
 
-        """Contolla se la tessera sanitaria dell'utente è ancora valida o se invece è scaduta
+        """Controlla se la tessera sanitaria dell'utente è ancora valida o se invece è scaduta
 
-        Restiurse False se non viene aggiornata la data di scadenza della tessera e il profilo viene eliminato
+        Restiuisce False se non viene aggiornata la data di scadenza della tessera e il profilo viene eliminato
         Restituisce True altrimenti
         """
 

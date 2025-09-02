@@ -107,10 +107,9 @@ class ProfiloUtente(ABC):
 
             if tentativi == 0:
                 op: str  # abbreviazione per operazione
-                print(
-                    "Digitare 2 per iscriversi al servizio se non si è in possesso di un profilo utente già registrato")
+                print("Digitare 2 per iscriversi al servizio se non si è in possesso di un profilo utente già registrato")
                 print("Digitare exit se si vuole terminare le operazioni")
-                op = input()
+                op = check_se_vuoto('')
                 return op
 
         # sezione dedicata al controllo password, si esegue questa sezione solo quando viene trovato il nome utente nel database
