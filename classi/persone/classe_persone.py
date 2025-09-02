@@ -332,7 +332,6 @@ class ProfiloCliente(ProfiloUtente) :
             for farmaco in results.to_dict(orient="records"):
                 print(farmaco)
 
-            print(type(results))
             self.ordine.aggiungi_a_carrello(results)
 
         if results.empty:
@@ -582,7 +581,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
             cod = "1"
         else :
             cod = str(int(cod) + 1)
-
+        print(cod)
         new_farmaco = Farmaco(cod)
         new_farmaco.aggiungi_farmaco_a_db()
 
