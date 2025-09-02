@@ -105,7 +105,7 @@ class Farmaco :
                 print(f"Con la precedente selzione rimangono {rimane} campioni ")
                 if rimane == 0:
                     print("Il prodotto è terminato non è possibile acquistarlo")
-                    break
+                    return 0
 
             # controllo sull'inserimento della quantità di prodotto che si vuole acquistare
             while quantity <=0:
