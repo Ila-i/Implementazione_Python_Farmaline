@@ -41,6 +41,8 @@ class Farmaco :
                 ck_prezzo = True
             except ValueError:
                 print("Il valore inserito non è compatibile, riprovare")
+            if self.prezzo <= 0:
+                print("Il parametro non può assumere valore negativo o nullo")
 
         self.scheda_tecnica= SchedaTecnica()
 
