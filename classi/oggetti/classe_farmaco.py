@@ -34,11 +34,9 @@ class Farmaco :
                 print("Il parametro non può assumere valore negativo o nullo")
 
         # per controllare che il prezzo inserito sia un valore valido
-        ck_prezzo: bool = False
-        while not ck_prezzo:
+        while self.prezzo <= 0:
             try:
                 self.prezzo = float(input("Inserire il prezzo del prodotto in euro ( 0.00 ): "))
-                ck_prezzo = True
             except ValueError:
                 print("Il valore inserito non è compatibile, riprovare")
             if self.prezzo <= 0:
@@ -99,7 +97,6 @@ class Farmaco :
         while not controllo_q:  # consente di riprovare se non è sufficente la quantità
 
             quantity: int = 0
-            ck: bool = False
 
             # fornisce informazioni sulla quantità disponibile in magazzino tenendo conto di una precente selzione dello stesso farmaco
             if ck_se_presente:
@@ -111,16 +108,13 @@ class Farmaco :
                     break
 
             # controllo sull'inserimento della quantità di prodotto che si vuole acquistare
-            while not ck:
+            while quantity <=0:
                 try:
                     quantity = int(input("Inserire la quantità di prodotto che si vuole acquistare : "))
-                    if quantity == 0:
-                        print("non può assumere valore nullo, riprovare ")
-                        ck = False
-                    else:
-                        ck = True
+                    if quantity <= 0:
+                        print("non può assumere valore nullo o negativo, riprovare ")
+
                 except ValueError:
-                    ck = False
                     print("il valore inserito non è compatibile, riprovare")
 
             if ck_se_presente:  # se già selezionato la nuova quantità viene aggiunta alla precedente

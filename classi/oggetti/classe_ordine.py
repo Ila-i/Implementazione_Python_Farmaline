@@ -23,7 +23,7 @@ class Ordine :
     def aggiungi_a_carrello(self, results: DataFrame ) -> None:
 
         codice_p : str
-        quanity_p :int
+        quantity_p :int=0
 
         codice_p = Farmaco.controllo_codice_farmaco(results)
 
