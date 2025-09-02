@@ -80,10 +80,11 @@ class Farmaco :
         return codice_input
 
     @classmethod
-    def controllo_quanto_farmaco(cls,  quanto_in_m: int, ck_se_presente: bool , quanto_in_c:int = 0) -> int:
+    def controllo_quanto_farmaco(cls,codice_f :str,  quanto_in_m: int, ck_se_presente: bool , quanto_in_c:int = 0) -> int:
 
         """Controlla che la quantità di farmaco che si vuole acquistare sia disponibile in magazzino
 
+        :param codice_f indica il codice del farmaco selezionato
         :param quanto_in_m indica la quantità di faramco nel magazzino
         :param ck_se_presente indica se il faramco era già stato selezionato
         :param quanto_in_c indica la quantà di farmaco gia presente nel carrello se precedentemente selezionato
@@ -124,7 +125,7 @@ class Farmaco :
                 quantity = quantity + quanto_in_c
 
             # controlla che la quantità che si vuole acquistare non sia superiore a quella disponibile in magazzino
-            query = f"SELECT quantità FROM FarmaciMagazzino WHERE quantità < '{quantity}' AND codice_farmaco = '{codice_input}' "
+            query = f"SELECT quantità FROM FarmaciMagazzino WHERE quantità < '{quantity}' AND codice_farmaco = '{codice_f}' "
             q_trovata = pd.read_sql(query, connection)
 
             if q_trovata.empty:  # nel magazzino c'è una quanittà di prodotto sufficiente

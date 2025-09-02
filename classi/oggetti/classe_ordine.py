@@ -38,9 +38,9 @@ class Ordine :
                 break
 
         if not ck_se_presente:
-            quantity_p = Farmaco.controllo_quanto_farmaco(quanto_in_m, ck_se_presente)
+            quantity_p = Farmaco.controllo_quanto_farmaco(codice_p,quanto_in_m, ck_se_presente)
         else:
-            quantity_p = Farmaco.controllo_quanto_farmaco(quanto_in_m, ck_se_presente, self.quanto_compro[codice_p])
+            quantity_p = Farmaco.controllo_quanto_farmaco(codice_p,quanto_in_m, ck_se_presente, self.quanto_compro[codice_p])
 
         if quantity_p > 0:
 
