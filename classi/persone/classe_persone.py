@@ -1,4 +1,5 @@
-from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla_lunghezza, check_nascita
+from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla_lunghezza, check_nascita, \
+    controlla_si_no
 from classi.documenti.classe_tesserino_professionale import TesserinoProfessionale
 from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
 from classi.oggetti.classe_farmaco import Farmaco
@@ -229,12 +230,12 @@ class ProfiloCliente(ProfiloUtente) :
                 'tipo_profilo',
                 'id_cliente'
             ],
-            data=[
+            data=[[
                 self.nome_utente,
                 self.password,
                 self.tipo_profilo,
                 self.id_utente
-            ]
+            ]]
         )
         new_profile.to_sql('ProfiloUtente', connection, if_exists='append', index=False)
         connection.commit()
@@ -246,7 +247,7 @@ class ProfiloCliente(ProfiloUtente) :
         scelta_filtri: str
 
         print("BARRA DI RICERCA")
-        scelta_filtri = input("Vuoi applicare dei filtri alla tua ricerca? (digitare si o no) : ")
+        scelta_filtri = controlla_si_no("Vuoi applicare dei filtri alla tua ricerca? (digitare si o no) : ")
 
         if scelta_filtri == "si":
 
@@ -434,13 +435,15 @@ class ProfiloCliente(ProfiloUtente) :
                     print("Operazione fallita") # se la carta è scaduta
                 else:
                     print("Operazione andata a buon fine")
-                    self.ordine.associa_numero_ordine(indirizzo, self.id_utente)
+                    self.ordine.aggiungi_ordine_a_db(indirizzo, self.id_utente)
                     self.ordine.update_quantity(self.id_utente)
+                    print(f"Fornire il seguente codice al momento del ritiro : {self.ordine.codice_ordine}")
 
             elif metodo == "2":
                 print("Operazione andata a buon fine")
-                self.ordine.associa_numero_ordine(indirizzo, self.id_utente)
+                self.ordine.aggiungi_ordine_a_db(indirizzo, self.id_utente)
                 self.ordine.update_quantity(self.id_utente)
+                print(f"Fornire il seguente codice al momento del ritiro : {self.ordine.codice_ordine}")
 
             else :
                 print("Opzione non valida")

@@ -76,3 +76,16 @@ def check_se_vuoto(messaggio: str) -> str :
    while len(parametro) == 0 :
         parametro = input(f" il parametro non può essere vuoto, riprovare : ")
    return parametro
+
+def controlla_si_no(messaggio:str)-> str :
+
+    """Verifica che la risposta al messaggio sia un si o un no
+
+    Restituisce la risposta corretta"""
+
+    risposta: str = input(messaggio)
+
+    while risposta != "si" and risposta != "no":
+        risposta = input("La risposta fornita non è valida, riprovare")
+
+    return risposta

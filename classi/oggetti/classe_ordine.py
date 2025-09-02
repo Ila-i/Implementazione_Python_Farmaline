@@ -71,9 +71,7 @@ class Ordine :
             else:
                 print("La quantità di farmaco in magazzino non è sufficiente, riprovare  ")
 
-    def associa_numero_ordine(self,indirizzo: str, id_utente :str) -> None:
-
-        print(f"Fornire il seguente codice al momento del ritiro : {self.codice_ordine}")
+    def aggiungi_ordine_a_db(self, indirizzo: str, id_utente :str) -> None:
 
         # agginge il nuovo ordine al database
         new_ordine = pd.DataFrame(

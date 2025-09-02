@@ -1,4 +1,4 @@
-from funzioni_generali.controlli_function import controlla_lunghezza, check_se_vuoto, check_scadenza
+from funzioni_generali.controlli_function import controlla_lunghezza, check_se_vuoto, check_scadenza, controlla_si_no
 from datetime import datetime, date
 from sqlalchemy import text
 from db import connection
@@ -59,7 +59,7 @@ class TesseraSanitaria :
                 'data_scadenza',
                 'numero_identificazione_tessera'
             ],
-            data = [
+            data = [[
                 self.codice_fiscale,
                 self.sesso,
                 self.luogo_nascita,
@@ -67,7 +67,7 @@ class TesseraSanitaria :
                 self.data_nascita,
                 self.data_scadenza,
                 self.numero_identificazione_tessera
-            ]
+            ]]
         )
         new_tessera.to_sql('TesseraSanitaria', connection, if_exists='append', index=False)
         connection.commit()
@@ -91,8 +91,7 @@ class TesseraSanitaria :
 
         while not data_ck:
 
-            print("La tessera sanitaria risulta scaduta. Vuoi aggiornare la data di scadenza ? Digitare si o no")
-            verifica = input()
+            verifica = controlla_si_no("La tessera sanitaria risulta scaduta. Vuoi aggiornare la data di scadenza ? Digitare si o no")
 
             if verifica == "si":
 

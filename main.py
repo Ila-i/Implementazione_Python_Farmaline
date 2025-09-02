@@ -14,13 +14,16 @@ operazione= input()
 while operazione == "1":
 
     operazione = ProfiloUtente.accesso_utente()
-    profilo = ProfiloUtente.get_profilo(operazione)
 
     if operazione == "2" :
         if Persona.registrazione_utente() :
             operazione = "1"
         else :
             operazione = "exit"
+    elif operazione == "exit" :
+        break
+    else :
+        profilo = ProfiloUtente.get_profilo(operazione)
 
 # Operazioni con scelta di registrazione al servizio
 while operazione == "2":
@@ -29,7 +32,16 @@ while operazione == "2":
 
     if verifica:
         operazione = ProfiloUtente.accesso_utente()
-        profilo = ProfiloUtente.get_profilo(operazione)
+
+        if operazione == "2":
+            if Persona.registrazione_utente():
+                operazione = "1"
+            else:
+                operazione = "exit"
+        elif operazione == "exit":
+            break
+        else:
+            profilo = ProfiloUtente.get_profilo(operazione)
     else:
         operazione = "exit"
 

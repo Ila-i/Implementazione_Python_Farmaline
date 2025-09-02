@@ -1,5 +1,5 @@
 from classi.documenti.classe_scheda_tecninca import SchedaTecnica
-from funzioni_generali.controlli_function import check_se_vuoto
+from funzioni_generali.controlli_function import check_se_vuoto, controlla_si_no
 from db import connection
 import pandas as pd
 
@@ -16,8 +16,8 @@ class Farmaco :
     def __init__(self, codice:str)->None:
 
         self.nome = check_se_vuoto("Inserire il nome del farmaco : ")
-        self.serve_ricetta = check_se_vuoto("Il farmaco necessita di ricetta ? (digitare si o no) : ")
-        self.preparato_galenico = check_se_vuoto("È un preparato galenico ? (digitare si o no) : ")
+        self.serve_ricetta = controlla_si_no("Il farmaco necessita di ricetta ? (digitare si o no) : ")
+        self.preparato_galenico = controlla_si_no("È un preparato galenico ? (digitare si o no) : ")
         self.quantity = 0
         self.prezzo = 0.0
         self.codice_farmaco = codice
