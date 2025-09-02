@@ -1,8 +1,12 @@
 from pandas import DataFrame
 from sqlalchemy import text
+
+from classi.oggetti.classe_farmaco import Farmaco
 from db import connection
 import pandas as pd
 import random
+
+from funzioni_generali.controlli_function import controlla_si_no
 
 
 class Ordine :
@@ -18,27 +22,41 @@ class Ordine :
 
     def aggiungi_a_carrello(self, results: DataFrame ) -> None:
 
-        prodotto = self.controllo_prodotto(results)
+        codice_p : str
+        quanity_p :int
 
-        #controlla che la quantità che si vuole acquistare non sia superiore a quella disponibile in magazzino
-        query = f"SELECT quantità FROM FarmaciMagazzino WHERE quantità < '{prodotto["quantità"]}' AND codice_farmaco = '{prodotto["codice"]}' "
-        q_trovata = pd.read_sql(query, connection)
+        codice_p = Farmaco.controllo_codice_farmaco(results)
 
+        # ricerca se il prodotto era già stato aggiunto al carrello
+        ck_se_presente: bool = False  # in riferimento a un farmaco già presente nel carrello
+        quanto_in_m: int = 0 # in riferimento alla quantità di un prodotto nel carrello
 
-        if q_trovata.empty:# nel magazzino c'è una quanittà di prodotto sufficiente
-            aggiungi_carrello = input("\nDigitare 'si' se si vuole aggiungere il prodotto al carrello, altrimenti digitare 'no': ")
+        for contenuto in self.carrello:
+            quanto_in_m = contenuto["quantità"] # per prendere la quantità di prodotto nel magazzino
+            if codice_p == contenuto["codice_farmaco"]:
+                ck_se_presente = True
+                break
+
+        if not ck_se_presente:
+            quantity_p = Farmaco.controllo_quanto_farmaco(quanto_in_m, ck_se_presente)
+        else:
+            quantity_p = Farmaco.controllo_quanto_farmaco(quanto_in_m, ck_se_presente, self.quanto_compro[codice_p])
+
+        if quantity_p > 0:
+
+            aggiungi_carrello = controlla_si_no("\nDigitare 'si' se si vuole aggiungere il prodotto al carrello, altrimenti digitare 'no': ")
 
             if aggiungi_carrello == "si":
 
                 # recupera la riga che contiene le informazioni del farmaco che si vuole acquistare
-                riga = results.loc[results["codice_farmaco"] == prodotto["codice"]]
+                riga = results.loc[results["codice_farmaco"] == codice_p]
                 farmaco_dict = riga.iloc[0].to_dict()# prende la prima corrispondenza
 
-                if not prodotto["presente"] : # aggiunge al  carrelo solo se non ho messo nel carrello lo stesso prodotto
+                if not ck_se_presente : # aggiunge al  carrelo solo se non ho messo nel carrello lo stesso prodotto
                     self.carrello.append(farmaco_dict)
-                    self.quanto_compro[prodotto["codice"]]= prodotto["quantità"]
+                    self.quanto_compro[codice_p]= quantity_p
                 else :
-                    self.quanto_compro[prodotto["codice"]] = prodotto["quantità"]
+                    self.quanto_compro[codice_p] = quantity_p
 
                 print("Farmaco aggiunto al carrello.")
 
@@ -62,32 +80,6 @@ class Ordine :
                     print("Il carrello è vuoto.")
             else:
                 print("Operazione non valida.")
-
-
-        else: # non trova riscontri in magazzino
-            # prende la quantità di prodotto dal database e controlla se è nulla o meno
-            if q_trovata.iloc[0, 0] == 0:
-                print("Il prodotto è terminato non è possibile acquistarlo")
-            else:
-                print("La quantità di farmaco in magazzino non è sufficiente, riprovare  ")
-
-    def aggiungi_ordine_a_db(self, indirizzo: str, id_utente :str) -> None:
-
-        # agginge il nuovo ordine al database
-        new_ordine = pd.DataFrame(
-            [[
-                self.codice_ordine,
-                id_utente,
-                indirizzo,
-            ]],
-            columns=[
-                'numero_ordine',  # <-- niente spazio finale
-                'codice_fiscale',
-                'indirizzo_consegna',
-            ]
-        )
-        new_ordine.to_sql('Ordine', connection, if_exists='append', index=False)
-        connection.commit()
 
     def stampa_carrello(self)-> None:
 
@@ -114,82 +106,20 @@ class Ordine :
             connection.execute(text(query))
             connection.commit()
 
-    def controllo_prodotto(self, results: DataFrame)-> dict:
+    def aggiungi_ordine_a_db(self, indirizzo: str, id_utente :str) -> None:
 
-        """Restituisce un dizionario con il codice del prodotto selezionato , la quantità che si vuole acquistare e un valore booleano True se è già presente nel carrello"""
-
-        codice_input: str = ''
-        quanto_in_m: int = 0
-
-        # sezione dedicata al controllo del codice se è presente o meno nell'elenco trovato nella ricerca
-
-        if len(results) > 1:  # Se ce più di un farmaco nell'elenco
-
-            ck: bool = False
-
-            while not ck:
-
-                codice_input = input("\nInserire il codice del farmaco che si vuole acquistare: ")
-                verifica_cod: bool = False
-
-                for prodotto in results.to_dict(orient="records"):
-                    if codice_input == prodotto["codice_farmaco"]:
-                        verifica_cod = True
-                        break
-
-                if not verifica_cod:
-                    print("Il codice inserito non è valido, o non è presente tra quelli elencati")
-                    ck = False
-                else:
-                    ck = True
-
-        else:  # Se ce solo un farmaco nell'elenco
-            codice_input = (results.iloc[0]["codice_farmaco"])
-
-        # ricerca se il prodotto era già stato aggiunto al carrello
-
-        ck_se_presente: bool = False  # in riferimento a un farmaco già presente nel carrello
-
-        for contenuto in self.carrello:
-            quanto_in_m = contenuto["quantità"]
-            if codice_input == contenuto["codice_farmaco"]:
-                ck_se_presente = True
-                break
-
-        # sezione di codice per controllare che la quantità che si vuole acquistare sia disponibile
-
-        controllo_q: bool = False
-
-        while not controllo_q:  # consente di riprovare se non è sufficente la quantità
-
-            quantity: int = 0
-            ck: bool = False
-
-            # fornisce informazioni sulla quantità disponibile in magazzino tenendo conto di una precente selzione dello stesso farmaco
-            if ck_se_presente:
-                rimane = quanto_in_m - self.quanto_compro[codice_input]
-                print(" Il farmaco è stato precedentemente selezionato. ")
-                print(f"Con la precedente selzione rimangono {rimane} campioni ")
-                if rimane == 0:
-                    print("Il prodotto è terminato non è possibile acquistarlo")
-                    break
-
-            # controllo sull'inserimento della quantità che di prodotto che si vuole acquistare
-            while not ck:
-                try:
-                    quantity = int(input("Inserire la quantità di prodotto che si vuole acquistare : "))
-                    if quantity == 0:
-                        print("non può assumere valore nullo, riprovare ")
-                        ck = False
-                    else:
-                        ck = True
-                except ValueError:
-                    ck = False
-                    print("il valore inserito non è compatibile, riprovare")
-
-            if ck_se_presente:  # se già selezionato la nuova quantità viene aggiunta alla precedente
-                quantity = quantity + self.quanto_compro[codice_input]
-
-            risultati : dict = {"codice" : codice_input, "quantità" : quantity, "presente": ck_se_presente}
-
-            return risultati
+        # agginge il nuovo ordine al database
+        new_ordine = pd.DataFrame(
+            [[
+                self.codice_ordine,
+                id_utente,
+                indirizzo,
+            ]],
+            columns=[
+                'numero_ordine',  # <-- niente spazio finale
+                'codice_fiscale',
+                'indirizzo_consegna',
+            ]
+        )
+        new_ordine.to_sql('Ordine', connection, if_exists='append', index=False)
+        connection.commit()

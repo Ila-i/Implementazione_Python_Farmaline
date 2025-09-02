@@ -86,6 +86,6 @@ def controlla_si_no(messaggio:str)-> str :
     risposta: str = input(messaggio)
 
     while risposta != "si" and risposta != "no":
-        risposta = input("La risposta fornita non è valida, riprovare")
+        risposta = input("La risposta fornita non è valida, riprovare : ")
 
     return risposta

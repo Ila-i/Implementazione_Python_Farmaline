@@ -56,6 +56,7 @@ if isinstance( profilo , ProfiloUtente) :
 
         check_tessera = TesseraSanitaria.check_se_ancora_valida(profilo.id_utente)
 
+        # sezione per ricerca e acquisto farmaci
         if check_tessera :
 
             while opzioni_c == "1":
@@ -86,6 +87,7 @@ if isinstance( profilo , ProfiloUtente) :
             print("Digitare exit per terminare le operazioni")
             opzioni_f = input()
 
+            #sezione per applicare modifiche al magazzino
             if opzioni_f == "1":
                 profilo.aggiorna_magazzino()
                 print("Digitare 1 se si desidera aggiungere nuovi farmaci al magazzino")
@@ -103,6 +105,7 @@ if isinstance( profilo , ProfiloUtente) :
                 print("Digitare exit per terminare le operazioni")
                 opzioni_f = input()
 
+            #sezione per confermare l'avvenuta consegna degli ordini arrivati alla farmacia
             while opzioni_f == "2" and not ck_op:
                 print("PROCEDURA DI VERIFICA")
                 profilo.verifica_ordine()
@@ -128,6 +131,7 @@ if isinstance( profilo , ProfiloUtente) :
             print("Digitare exit se si desidera terminare le operazioni")
             opzioni_m = input()
 
+            # sezione dedicata alla prescrizione di ricette
             while opzioni_m == "1" :
                 print("PROCEDURA DI PRESCRIZIONE RICETTA MEDICA")
                 profilo.crea_ricetta()

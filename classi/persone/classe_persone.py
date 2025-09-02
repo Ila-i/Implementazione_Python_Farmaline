@@ -201,12 +201,12 @@ class ProfilolavoratoreSanitario(ProfiloUtente) :
                 'tipo_profilo',
                 'id_sanitari'
             ],
-            data=[
+            data=[[
                 self.nome_utente,
                 self.password,
                 self.tipo_profilo,
                 self.id_utente
-            ]
+            ]]
         )
         new_profile.to_sql('ProfiloUtente', connection, if_exists='append', index=False)
         connection.commit()
@@ -270,7 +270,7 @@ class ProfiloCliente(ProfiloUtente) :
             query = """
                     SELECT 
 
-                        f.codice_farmaco 
+                        f.codice_farmaco, 
                         f.nome,
                         f.serve_ricetta,
                         f.preparato_galenico,
@@ -696,12 +696,12 @@ class LavoratoreSanitario (Persona) :#classe base
                 'cognome',
                 'professione',
                 'matricola'],
-            data=[
+            data=[[
                 self.nome,
                 self.cognome,
                 self.t_p.ordine_di_appartenenza,
                 self.t_p.n_matricola
-            ]
+            ]]
         )
         new_lav_sani.to_sql('Sanitari', connection, if_exists='append', index=False)
         connection.commit()
@@ -778,11 +778,11 @@ class Cliente(Persona):
                 'cognome',
                 'codice_fiscale'
             ],
-            data=[
+            data=[[
                 self.nome,
                 self.cognome,
                 self.t_s.codice_fiscale
-            ]
+            ]]
         )
         new_cliente.to_sql('Clienti', connection, if_exists='append', index=False)
         connection.commit()

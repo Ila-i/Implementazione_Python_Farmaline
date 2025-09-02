@@ -19,10 +19,10 @@ class TesserinoProfessionale :
                 'ordine_appartenenza',
                 'matricola'
             ],
-            data=[
+            data=[[
                 self.ordine_di_appartenenza,
                 self.n_matricola
-            ]
+            ]]
         )
         new_tesserino.to_sql('TesserinoProfessionale', connection, if_exists='append', index=False)
         connection.commit()
