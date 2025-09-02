@@ -87,7 +87,7 @@ class Ordine :
             print(f" codice : {prodotto["codice_farmaco"]} ")
             print(f" nome : {prodotto["nome"]} ")
             print(f" quantità : {self.quanto_compro[prodotto["codice_farmaco"]]} ")
-            print(f" prezzo : {self.quanto_compro[prodotto["codice_farmaco"]] * float(prodotto["prezzo"])} €")
+            print(f" prezzo : {self.quanto_compro[prodotto["codice_farmaco"]] * float(prodotto["prezzo"]):.2f} €")
 
     def update_quantity(self, id_utente :str)->None:
 

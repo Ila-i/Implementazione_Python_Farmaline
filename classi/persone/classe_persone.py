@@ -391,7 +391,7 @@ class ProfiloCliente(ProfiloUtente) :
         for prodotto in self.ordine.carrello:
             prezzo_tot = prezzo_tot + float(prodotto["prezzo"]) * self.ordine.quanto_compro[prodotto["codice_farmaco"]]
 
-        print(f"Prezzo totale dell'ordine : {prezzo_tot} €")
+        print(f"Prezzo totale dell'ordine : {prezzo_tot:.2f} €")
 
         print("Digitare 1 se si desidera procedere al pagamento")
         print("Digitare exit se si desidera annullare l'operazione")
