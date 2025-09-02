@@ -573,7 +573,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
         print("Per aggiungere una nuova tipologia di medicinale in magazzino, seguire le istruzioni di seguito riportate ")
 
-        query = "SELECT MAX(codice_farmaco) FROM SchedaTecnica"
+        query = "SELECT MAX(CAST(codice_farmaco AS INT)) FROM SchedaTecnica"
         cod = pd.read_sql(query, connection)
         cod = str(cod.iloc[0, 0])
 
@@ -581,7 +581,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
             cod = "1"
         else :
             cod = str(int(cod) + 1)
-        print(cod)
+
         new_farmaco = Farmaco(cod)
         new_farmaco.aggiungi_farmaco_a_db()
 
