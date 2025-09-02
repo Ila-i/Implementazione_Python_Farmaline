@@ -149,4 +149,3 @@ if isinstance( profilo , ProfiloUtente) :
 else :
     print("Operazione terminata")
 
-#TODO controllo quantità dei farmaci corrisponda al numero di ricette( e aggiornare i documenti)
