@@ -69,9 +69,12 @@ if isinstance( profilo , ProfiloUtente) :
                 if opzioni_c == "1":
                     while opzioni_c == "1":
                         profilo.search_bar()
-                        print("Digitare 1 se si desidera continuare a ricercare medicinali da acquistare ")
-                        print("Digitare 2 se si desidera terminare la ricerca e procedere all'acquisto ")
-                        opzioni_c = input()
+                        if profilo.ordine.carrello:
+                            print("Digitare 1 se si desidera continuare a ricercare medicinali da acquistare ")
+                            print("Digitare 2 se si desidera terminare la ricerca e procedere all'acquisto ")
+                            opzioni_c = input()
+                        else:
+                            opzioni_c = "exit"
 
                     if opzioni_c == "2":
                         print("PROCEDURA DI ACQUISTO")

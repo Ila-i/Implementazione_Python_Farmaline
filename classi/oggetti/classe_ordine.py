@@ -52,7 +52,7 @@ class Ordine :
                 riga = results.loc[results["codice_farmaco"] == codice_p]
                 farmaco_dict = riga.iloc[0].to_dict()# prende la prima corrispondenza
 
-                if not ck_se_presente : # aggiunge al  carrelo solo se non ho messo nel carrello lo stesso prodotto
+                if not ck_se_presente : # aggiunge al  carrello solo se non ho messo nel carrello lo stesso prodotto
                     self.carrello.append(farmaco_dict)
                     self.quanto_compro[codice_p]= quantity_p
                 else :
@@ -84,7 +84,7 @@ class Ordine :
     def stampa_carrello(self)-> None:
 
         for prodotto in self.carrello:
-            print(f" codice : {prodotto["codice_farmaco"]} ")
+            print(f" codice farmaco : {prodotto["codice_farmaco"]} ")
             print(f" nome : {prodotto["nome"]} ")
             print(f" quantità : {self.quanto_compro[prodotto["codice_farmaco"]]} ")
             print(f" prezzo : {self.quanto_compro[prodotto["codice_farmaco"]] * float(prodotto["prezzo"]):.2f} €")
@@ -108,7 +108,7 @@ class Ordine :
 
     def aggiungi_ordine_a_db(self, indirizzo: str, id_utente :str) -> None:
 
-        # agginge il nuovo ordine al database
+        # aggiunge il nuovo ordine al database
         new_ordine = pd.DataFrame(
             [[
                 self.codice_ordine,
@@ -116,7 +116,7 @@ class Ordine :
                 indirizzo,
             ]],
             columns=[
-                'numero_ordine',  # <-- niente spazio finale
+                'numero_ordine',
                 'codice_fiscale',
                 'indirizzo_consegna',
             ]
