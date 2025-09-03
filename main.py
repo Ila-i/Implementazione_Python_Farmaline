@@ -88,7 +88,7 @@ if isinstance( profilo , ProfiloUtente) :
     # sezione dedicata al farmacista
     elif isinstance(profilo , ProfiloFarmacista) :
 
-        opzioni_f: str = "1"# opsioni farmacista
+        opzioni_f: str = "1"# opzioni farmacista
         ck_f: bool = False # abbreviazione per check_farmacista
 
         while not ck_f :
