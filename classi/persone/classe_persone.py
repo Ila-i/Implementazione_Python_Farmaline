@@ -518,7 +518,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
             scelta_op: str
 
             print("Diditare 1 se si vuole aggiornare le quantità dei farmaci sopra elencati digitare")
-            print("Digiatre 2 per procedere con altre operazioni")
+            print("Digiatre exit per procedere con altre operazioni")
             scelta_op = input()
 
             while scelta_op == "1":
@@ -555,17 +555,17 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
                         return None
 
                     print("Digitare 1 se si desidera continuare ad aggiornare le quantità")
-                    print("Digitare 2 per procedere con altre operazioni")
+                    print("Digitare exit per procedere con altre operazioni")
                     scelta_op = input()
 
-                    if scelta_op == '2' :
+                    if scelta_op == 'exit' :
                         return None
 
                 else:
                     print("Il codice inserito non è presente nella lista fornita , riprovare ")
                     scelta_op = "1"
 
-            if scelta_op == "2":
+            if scelta_op == "exit":
                 return None
 
             else:
