@@ -274,7 +274,6 @@ class ProfiloCliente(ProfiloUtente) :
 
             query = """
                     SELECT 
-
                         f.codice_farmaco, 
                         f.nome,
                         f.serve_ricetta,
