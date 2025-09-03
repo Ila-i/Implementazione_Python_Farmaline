@@ -470,7 +470,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
         cod_fisc = controlla_lunghezza("Inserire il codice fiscale del cliente( es. RSSMRA00A01H501C ) : ", 16 )
         n_ordine = check_se_vuoto("Inserire il numero dell'ordine : ")
 
-        query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Univeristà di Santa Marta, 26' "
+        query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Università di Santa Marta, 26' "
         trovato = pd.read_sql(query, connection)
 
         while trovato.empty:
@@ -479,7 +479,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
             cod_fisc = controlla_lunghezza("Inserire il codice fiscale del cliente ( es. RSSMRA00A01H501C )  : ", 16)
             n_ordine = check_se_vuoto("Inserire il numero dell'ordine : ")
 
-            query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Univeristà di Santa Marta, 26' "
+            query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Università di Santa Marta, 26' "
             trovato = pd.read_sql(query, connection)
             count -= 1
 
@@ -490,7 +490,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
         if count > 0:
             print("Ordine trovato")
             print(str(trovato.iloc[0]))
-            query = f"DELETE FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Univeristà di Santa Marta, 26' "
+            query = f"DELETE FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Università di Santa Marta, 26' "
             connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
             connection.commit()
             print("Ordine rimosso dal database")
@@ -502,6 +502,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
         controllo_scelta: bool = False
 
+        # sezione di codice per cercare nel database se ci sono farmaci che stanno per terminare
         query = "SELECT codice_farmaco, nome, quantità FROM FarmaciMagazzino WHERE quantità <= 2 "
         riordinare = pd.read_sql(query, connection)
 
@@ -513,11 +514,12 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
             print("Non ci sono prodotti che stanno per terminare o sono già terminati")
             return None
 
+        # sezione di codice che permette di aggiornare le quantità di faramaci che stanno per terminare
         while not controllo_scelta:
 
             scelta_op: str
 
-            print("Diditare 1 se si vuole aggiornare le quantità dei farmaci sopra elencati digitare")
+            print("Diditare 1 se si vuole aggiornare le quantità dei farmaci sopra elencati")
             print("Digiatre exit per procedere con altre operazioni")
             scelta_op = input()
 
@@ -541,7 +543,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
                             print("Il parametro non può assumere valore negativo o nullo")
 
                     query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice_farmaco = '{cod}'"
-                    connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
+                    connection.execute(text(query))
                     connection.commit()
 
                     query = "SELECT codice_farmaco, nome, quantità FROM FarmaciMagazzino WHERE quantità <= 2 "
@@ -642,7 +644,7 @@ class LavoratoreSanitario (Persona) :#classe base
         query = f"SELECT * FROM Sanitari WHERE matricola = '{self.t_p.n_matricola}'"
         lav_sani = pd.read_sql(query, connection)
 
-        # si definisce la ricerca da database per controllare se la persona è già registrata
+        #sezione di codice per verificare che il codice inserito non appartenga a un'altra tessera sanitaria
         if not lav_sani.empty: # è un dataframe
             ck_scelta: bool = False
             print("La matricola inserita appartiene a un utente già registrato")
@@ -672,8 +674,8 @@ class LavoratoreSanitario (Persona) :#classe base
     def crea_profilo(self) ->bool:
 
         print("CREAZIONE PROFILO UTENTE")
-        nome = check_se_vuoto(" inserire un nome utente : ")  # inserire controllo per corrispondenza profilo utente
-        password = check_se_vuoto(" inserire una password : ")
+        nome = check_se_vuoto(" Inserire un nome utente : ")
+        password = check_se_vuoto(" Inserire una password : ")
 
         profilo = ProfilolavoratoreSanitario(nome, password, self.t_p.n_matricola, self.t_p.ordine_di_appartenenza)
 
@@ -720,13 +722,13 @@ class Cliente(Persona):
 
         ck_data: bool
 
-        self.t_s.data_nascita = check_nascita(self.t_s.data_nascita)# per verificare che la data di nascita non indichi una data futura
-        ck_data= check_scadenza(self.t_s.data_scadenza)# per verificare che la tessera registrata non sia scaduta
+        self.t_s.data_nascita = check_nascita(self.t_s.data_nascita)
+        ck_data= check_scadenza(self.t_s.data_scadenza)
 
 
         if ck_data and self.t_s.data_nascita != date.today()  :
 
-            #per verificare che il codice inserito non appartenga a un'altra tessera sanitaria
+            #sezione di codice per verificare che il codice inserito non appartenga a un'altra tessera sanitaria
 
             query = f"SELECT * FROM Clienti WHERE codice_fiscale = '{self.t_s.codice_fiscale}'"
             cliente = pd.read_sql(query, connection)
@@ -755,8 +757,8 @@ class Cliente(Persona):
     def crea_profilo(self) ->bool:
 
         print("CREAZIONE PROFILO UTENTE")
-        nome = check_se_vuoto(" inserire un nome utente : ")  # inserire controllo per corrispondenza profilo utente
-        password = check_se_vuoto(" inserire una password : ")
+        nome = check_se_vuoto(" Inserire un nome utente : ")
+        password = check_se_vuoto(" Inserire una password : ")
         profilo = ProfiloCliente(nome, password, self.t_s.codice_fiscale, 'cliente')
         ck_profilo = profilo.controllo_nome_utente()
 
