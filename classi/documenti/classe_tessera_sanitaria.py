@@ -24,7 +24,7 @@ class TesseraSanitaria :
         self.luogo_nascita = check_se_vuoto(" LUOGO DI NASCITA : ")
         self.provincia = controlla_lunghezza(" PROVINCIA ( es. RM): ", 2)
 
-        #controllo che la data di nascita sia inserita correttamente
+        #controlla che la data di nascita sia inserita correttamente
         while not ck_d:
             data_input = controlla_lunghezza(" DATA DI NASCITA (es. gg/mm/aaaa) : ", 10)
             try:
@@ -34,7 +34,7 @@ class TesseraSanitaria :
                 print("Data non valida!")
                 ck_d=False
 
-        #controllo che la data di scadenza sia inserita correttamente
+        #controlla che la data di scadenza sia inserita correttamente
         ck_d= False
         while not ck_d:
             data_input = controlla_lunghezza(" DATA DI SCADENZA (es. gg/mm/aaaa) : ", 10)
@@ -51,7 +51,7 @@ class TesseraSanitaria :
 
         new_tessera = pd.DataFrame(
             columns=[
-                'codice_fiscale',  # <-- niente spazio finale
+                'codice_fiscale',
                 'sesso',
                 'luogo_nascita',
                 'provincia',
@@ -77,7 +77,7 @@ class TesseraSanitaria :
 
         """Controlla se la tessera sanitaria dell'utente è ancora valida o se invece è scaduta
 
-        Restiuisce False se non viene aggiornata la data di scadenza della tessera e il profilo viene eliminato
+        Restiuisce False se non viene aggiornata la data di scadenza della tessera
         Restituisce True altrimenti
         """
 
@@ -91,13 +91,13 @@ class TesseraSanitaria :
 
         while not data_ck:
 
-            verifica = controlla_si_no("La tessera sanitaria risulta scaduta. Vuoi aggiornare la data di scadenza ? Digitare si o no")
+            verifica = controlla_si_no("La tessera sanitaria risulta scaduta. Vuoi aggiornare la data di scadenza ? (Digitare si o no) ")
 
             if verifica == "si":
 
                 ck : bool = False
 
-                #controllo che la data di scadenza inserita sia un valore valido
+                #controlla che la data di scadenza inserita sia un valore valido
                 while not ck:
                     data_input = controlla_lunghezza("NUOVA DATA DI SCADENZA (gg/mm/aaaa) : ", 10)
                     try:
@@ -114,7 +114,7 @@ class TesseraSanitaria :
 
             elif verifica == "no":
 
-                print("Il profilo sarà temporanemente sospeso fino a che non sarà aggiornata la tessera sanitaria")
+                print("Il profilo sarà temporaneamente sospeso fino a che non sarà aggiornata la tessera sanitaria")
                 return False
 
             else:

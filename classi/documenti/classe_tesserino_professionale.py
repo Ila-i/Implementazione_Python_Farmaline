@@ -5,7 +5,7 @@ import pandas as pd
 
 class TesserinoProfessionale :
 
-    ordine_di_appartenenza: str # indica il settore lavorativo a cui appartieni
+    ordine_di_appartenenza: str # indica il settore lavorativo a cui si appartie
     n_matricola : str # indica il numero di iscrizione all'albo di riferimento
 
     def __init__(self, ordine :str)->None:
