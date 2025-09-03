@@ -100,7 +100,7 @@ class ProfiloUtente(ABC):
         while profile_check.empty:
 
             username = check_se_vuoto(
-                f" Il nome utente inserito non appartiente a un utente registarto, riprovare (tentativi rimasti {tentativi}): ")
+                f" Il nome utente inserito non appartiente a un utente registrato, riprovare (tentativi rimasti {tentativi}): ")
             query = f"SELECT nome_utente, password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
             profile_check = pd.read_sql(query, connection)
             tentativi -= 1
@@ -121,7 +121,7 @@ class ProfiloUtente(ABC):
         # sezione dedicata al controllo password, si esegue questa sezione solo quando viene trovato il nome utente nel database
         if tentativi > 0:
 
-            pw: str  # pw abbrevviazione per password
+            pw: str  # pw abbreviazione per password
             tentativi = 3
 
             pw = check_se_vuoto("Inserire la propria password : ")
@@ -158,7 +158,7 @@ class ProfiloUtente(ABC):
             return True
 
     @classmethod
-    def get_profilo(cls, username :str ) -> "ProfiloUtente": #"ProfiloUtente" usato per indicare cheil metodo può restiture un oggetto della classe senza che venga istanziata
+    def get_profilo(cls, username :str ) -> "ProfiloUtente": #"ProfiloUtente" usato per indicare che il metodo può restiture un oggetto della classe senza che venga istanziata
 
         """Restituisce il ProfiloUtente con cui si fa l'accesso se l'operazione si è conclusa correttamente
         Restituisce None altrimenti"""
@@ -259,7 +259,7 @@ class ProfiloCliente(ProfiloUtente) :
             print("Indica almeno uno dei seguenti filtri, quando non si vuole mettere un filtro premere semplicemente invio")
             indicazioni_terapeutiche = input("Inserire la patologia da trattare : ")
             composizione = input("Indicare il principio attivo del farmaco : ")
-            posologia = input("Indicare se si sta ceranco farmaci per adulti, adolescenti o bambini: ")
+            posologia = input("Indicare se si sta cercando farmaci per adulti, adolescenti o bambini: ")
 
             filters: list[str] = []
 
@@ -354,8 +354,8 @@ class ProfiloCliente(ProfiloUtente) :
 
                 if controllo_ricetta == 0:
 
-                    print("per ricevere l'ordine a domicilio digitare 1")
-                    print("per ritirare l'ordine nella farmacia fisica 2")
+                    print("Digitare 1 per ricevere l'ordine a domicilio ")
+                    print("Digitare 2 per ritirare l'ordine nella farmacia fisica")
                     scelta_ind = input()
 
                 elif controllo_ricetta > 0:
@@ -413,10 +413,10 @@ class ProfiloCliente(ProfiloUtente) :
                 print("INSERIMENTO DATI CARTA")
                 nome = check_se_vuoto("Inserire il nome dell'intestatario : ")
                 cognome = check_se_vuoto("Inserire il cognome dell'intestatario : ")
-                numero_carta = controlla_lunghezza("Inserire numero della carta (es. 1234567890123456 ): ", 16)
+                numero_carta = controlla_lunghezza("Inserire il numero della carta (es. 1234567890123456 ): ", 16)
                 cvc = controlla_lunghezza("Inserire il CVC (es. 123 ): ", 3)
                 while not ck_data :
-                    data_input = controlla_lunghezza("Inserire  data di scadenza della carta(es. gg/mm/aaaa ): ", 10)
+                    data_input = controlla_lunghezza("Inserire la data di scadenza della carta(es. gg/mm/aaaa ): ", 10)
 
                     try:
                         data_scadenza = datetime.strptime(data_input, "%d/%m/%Y").date()
