@@ -52,14 +52,14 @@ if isinstance( profilo , ProfiloUtente) :
     # sezione dedicata al cliente
     if  isinstance(profilo , ProfiloCliente):
 
-        opzioni_c: str = "1"
+        opzioni_c: str = "1"# opzioni cliente
 
         check_tessera = TesseraSanitaria.check_se_ancora_valida(profilo.id_utente)
 
         # sezione per ricerca e acquisto farmaci
         if check_tessera :
 
-            ck_c: bool = False
+            ck_c: bool = False#abbreviazione per check_cliente
 
             while not ck_c:
                 print("Digitare 1 se si desidera acquistare dei farmaci")
@@ -88,7 +88,7 @@ if isinstance( profilo , ProfiloUtente) :
     # sezione dedicata al farmacista
     elif isinstance(profilo , ProfiloFarmacista) :
 
-        opzioni_f: str = "1"
+        opzioni_f: str = "1"# opsioni farmacista
         ck_f: bool = False # abbreviazione per check_farmacista
 
         while not ck_f :
@@ -102,6 +102,7 @@ if isinstance( profilo , ProfiloUtente) :
 
             #sezione per applicare modifiche al magazzino
             if opzioni_f == "1":
+                # sezione per aggiornare la quantità di farmaci in magazzino
                 profilo.aggiorna_magazzino()
                 print("Digitare 1 se si desidera aggiungere nuovi farmaci al magazzino")
                 print("Digitare exit per terminare le operazioni")
@@ -110,6 +111,7 @@ if isinstance( profilo , ProfiloUtente) :
                 if opzioni_f == "2":
                     ck_op = True
 
+            # sezione per aggiungere nuovi farmaci in magazzino
             while opzioni_f == "1":
                 print("PROCEDURA DI AGGIUNTA FARMACI")
                 profilo.aggiunta_farmaci()
@@ -136,7 +138,7 @@ if isinstance( profilo , ProfiloUtente) :
     #sezione dedicata al medico
     elif isinstance(profilo , ProfiloMedico):
 
-        opzioni_m: str = "1"
+        opzioni_m: str = "1"#opzioni medico
         ck_m: bool = False #ck abbreviazione per check_medico
 
         while not ck_m :
