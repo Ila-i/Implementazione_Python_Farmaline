@@ -594,7 +594,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 class ProfiloMedico(ProfilolavoratoreSanitario) :
 
     @staticmethod
-    def crea_ricetta() -> bool:
+    def crea_ricetta(matricola_medico :str) -> bool:
 
         print("Digitare il codice del farmaco che si vuole prescrivere, selezionando dal segunete elenco ")
 
@@ -617,7 +617,7 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
                 if not farma.empty:
                     cod_fisc = controlla_lunghezza("Inserire il codice fiscale del paziente a cui si sta prescrivendo il farmaco : ", 16)
 
-                    new_ricetta = Ricetta(cod_fisc, cod_farmaco)
+                    new_ricetta = Ricetta(cod_fisc, cod_farmaco, matricola_medico)
                     new_ricetta.aggiungi_ricetta_a_db()
 
                     print(f"Fornire il seguente codice al paziente , CODICE RICETTA : {new_ricetta.codice_ricetta}")

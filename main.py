@@ -149,7 +149,7 @@ if isinstance( profilo , ProfiloUtente) :
             # sezione dedicata alla prescrizione di ricette
             while opzioni_m == "1" :
                 print("PROCEDURA DI PRESCRIZIONE RICETTA MEDICA")
-                ck_m =profilo.crea_ricetta()
+                ck_m =profilo.crea_ricetta(profilo.id_utente)
                 if ck_m:
                     print("Digitare 1 se si desidera prescivere un'altra ricetta medica")
                     print("Digitare exit se si desidera terminare le operazioni")
