@@ -257,9 +257,9 @@ class ProfiloCliente(ProfiloUtente) :
         if scelta_filtri == "si":
 
             print("Indica almeno uno dei seguenti filtri, quando non si vuole mettere un filtro premere semplicemente invio")
-            indicazioni_terapeutiche = input("Inserire le indicazioni terapeutiche : ")
-            composizione = input("Inserire la composizione: ")
-            posologia = input("Inserire la posologia : ")
+            indicazioni_terapeutiche = input("Inserire la patologia da trattare : ")
+            composizione = input("Indicare il principio attivo del farmaco : ")
+            posologia = input("Indicare se si sta ceranco farmaci per adulti, adolescenti o bambini: ")
 
             filters: list[str] = []
 
