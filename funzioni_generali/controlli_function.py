@@ -3,7 +3,7 @@ from datetime import date
 
 def controlla_lunghezza(messaggio: str, lunghezza: int) -> str :
 
-   """Controlla che il valore in inmput abbia la stessa lunghezza indicata dal parametro lunghezza
+   """Controlla che il valore in input abbia la stessa lunghezza indicata dal parametro lunghezza
 
    messaggio contiene il messaggio che si vuole stampare a schermo per dare indicazioni all'utente su cosa inserire
    lunghezza indica quanto deve essere lungo il parametro da inserire in input come indicato dal messeggio
@@ -18,7 +18,7 @@ def controlla_lunghezza(messaggio: str, lunghezza: int) -> str :
 
 def check_nascita(data:datetime.date)-> datetime.date:
 
-    """Controlla dche la data di nascita sia già passata
+    """Controlla che la data di nascita sia già passata
 
     Ritorna la data corretta , o la data del giorno corrente se si terminano i tentativi per inserire quella corretta """
 
@@ -46,8 +46,8 @@ def check_scadenza(data: datetime.date) -> bool:
 
     """Controlla che le date di scadenza non siano già passate
 
-    Ritorns True quando può continuare
-    Ritrona False quando deve cessare le operazioni
+    Ritorna True quando può continuare
+    Ritorna False quando deve cessare le operazioni
     """
     today = date.today()  # funzione di Python che restituisce la data odierna
 
