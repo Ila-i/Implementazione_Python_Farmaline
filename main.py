@@ -59,31 +59,28 @@ if isinstance( profilo , ProfiloUtente) :
         # sezione per ricerca e acquisto farmaci
         if check_tessera :
 
-            ck_c: bool = False#abbreviazione per check_cliente
+            print("Digitare 1 se si desidera acquistare dei farmaci")
+            print("Digitare exit se si desidera terminare le operazioni")
+            opzioni_c = input()
 
-            while not ck_c:
-                print("Digitare 1 se si desidera acquistare dei farmaci")
-                print("Digitare exit se si desidera terminare le operazioni")
-                opzioni_c = input()
+            if opzioni_c == "1":
+                while opzioni_c == "1":
+                    profilo.search_bar()
+                    if profilo.ordine.carrello:
+                        print("Digitare 1 se si desidera continuare a ricercare medicinali da acquistare ")
+                        print("Digitare 2 se si desidera terminare la ricerca e procedere all'acquisto ")
+                        opzioni_c = input()
+                    else:
+                        opzioni_c = "exit"
 
-                if opzioni_c == "1":
-                    while opzioni_c == "1":
-                        profilo.search_bar()
-                        if profilo.ordine.carrello:
-                            print("Digitare 1 se si desidera continuare a ricercare medicinali da acquistare ")
-                            print("Digitare 2 se si desidera terminare la ricerca e procedere all'acquisto ")
-                            opzioni_c = input()
-                        else:
-                            opzioni_c = "exit"
+                if opzioni_c == "2":
+                    print("PROCEDURA DI ACQUISTO")
+                    profilo.scelta_indirizzi()
 
-                    if opzioni_c == "2":
-                        print("PROCEDURA DI ACQUISTO")
-                        profilo.scelta_indirizzi()
-
-                elif opzioni_c =="exit":
-                    break
-                else:
-                    print("Operazione non disponibile")
+            elif opzioni_c =="exit":
+                print("")
+            else:
+                print("Operazione non disponibile")
 
     # sezione dedicata al farmacista
     elif isinstance(profilo , ProfiloFarmacista) :
