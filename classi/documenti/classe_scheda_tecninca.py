@@ -2,7 +2,7 @@ from funzioni_generali.controlli_function import check_se_vuoto
 from db import connection
 import pandas as pd
 
-class SchedaTecnica :
+class SchedaTecnica : # scheda tecnica dei farmaci
 
     indicazioni_terapeutiche : str
     composizione : str
