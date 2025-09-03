@@ -9,8 +9,9 @@ class Ricetta :
     codice_ricetta : str
     id_utente :str
     codice_farmaco : str
+    matricola_medico :str
 
-    def __init__(self, id_u :str , cod_farmaco :str)->None:
+    def __init__(self, id_u :str , cod_farmaco :str, matricola :str)->None:
         self.id_utente = id_u
         self.codice_farmaco = cod_farmaco
         #per assegnare un codice nella forma 1234A 1234567890 alle ricette
@@ -18,6 +19,7 @@ class Ricetta :
                                 + create_random_string(1, string.ascii_uppercase))
                                 + ' '
                                 + create_random_string(10, string.digits))
+        self.matricola_medico = matricola
 
     @classmethod
     def verifica_dati_ricetta( cls, carrello : list[dict], quantity: dict, cod_fisc :str) -> int:
@@ -104,11 +106,13 @@ class Ricetta :
                 'codice_ricetta',
                 'codice_fiscale',
                 'codice_farmaco',
+                'matricola_medico'
             ],
             data=[[
                     self.codice_ricetta,
                     self.id_utente,
-                    self.codice_farmaco
+                    self.codice_farmaco,
+                    self.matricola_medico
                 ]]
         )
         ricetta.to_sql('Ricetta', connection, if_exists='append', index=False)
