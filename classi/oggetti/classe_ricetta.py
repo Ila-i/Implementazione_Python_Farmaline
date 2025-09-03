@@ -82,7 +82,7 @@ class Ricetta :
                                         break
 
                                 if not ck:
-                                    print("Il codice inserito non è valido, o non è presente tra quelli elencati")
+                                    print("Il codice inserito non è valido o non è presente tra quelli elencati")
 
                     elif quantity[codice_val] == len(ricetta_ck): # il numero di ricette è sufficente
 

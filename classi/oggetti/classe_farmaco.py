@@ -89,8 +89,8 @@ class Farmaco :
         :param ck_se_presente indica se il faramco era già stato selezionato
         :param quanto_in_c indica la quantà di farmaco gia presente nel carrello se precedentemente selezionato
 
-        Restituisce la quantità corretta di farmaco nel caso in cui ci fosse una quanità sufficente in magazzino
-        Restituisce 0 nel caso in cui il faramco fosse terminato"""
+        Restituisce la quantità corretta di farmaco nel caso in cui è presente una quantità sufficiente in magazzino
+        Restituisce 0 se il farmaco è terminato"""
 
         controllo_q: bool = False
 
@@ -124,7 +124,7 @@ class Farmaco :
             query = f"SELECT quantità FROM FarmaciMagazzino WHERE quantità < '{quantity}' AND codice_farmaco = '{codice_f}' "
             q_trovata = pd.read_sql(query, connection)
 
-            if q_trovata.empty:  # nel magazzino c'è una quanittà di prodotto sufficiente
+            if q_trovata.empty:  # nel magazzino c'è una quantità di prodotto sufficiente
                 return quantity
 
             else:  # non trova riscontri in magazzino
