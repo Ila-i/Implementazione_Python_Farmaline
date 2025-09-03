@@ -144,10 +144,13 @@ if isinstance( profilo , ProfiloUtente) :
             # sezione dedicata alla prescrizione di ricette
             while opzioni_m == "1" :
                 print("PROCEDURA DI PRESCRIZIONE RICETTA MEDICA")
-                profilo.crea_ricetta()
-                print("Digitare 1 se si desidera prescivere un'altra ricetta medica")
-                print("Digitare exit se si desidera terminare le operazioni")
-                opzioni_m = input()
+                ck_m =profilo.crea_ricetta()
+                if ck_m:
+                    print("Digitare 1 se si desidera prescivere un'altra ricetta medica")
+                    print("Digitare exit se si desidera terminare le operazioni")
+                    opzioni_m = input()
+                else :
+                    opzioni_m = "exit"
 
             if opzioni_m == "exit" :
                 ck_m = True

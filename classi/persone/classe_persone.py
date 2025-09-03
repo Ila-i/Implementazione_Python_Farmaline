@@ -593,7 +593,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 class ProfiloMedico(ProfilolavoratoreSanitario) :
 
     @staticmethod
-    def crea_ricetta() -> None:
+    def crea_ricetta() -> bool:
 
         print("Digitare il codice del farmaco che si vuole prescrivere, selezionando dal segunete elenco ")
 
@@ -620,7 +620,7 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
                     new_ricetta.aggiungi_ricetta_a_db()
 
                     print(f"Fornire il seguente codice al paziente , CODICE RICETTA : {new_ricetta.codice_ricetta}")
-                    ck_cod=True
+                    return True
 
                 else:
                     print("Il codice inserito non appartiente a nessun farmaco nell'elenco , riprovare: ")
@@ -628,7 +628,7 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
 
         else:
             print("Non ci sono farmaci con ricetta da poter prescrivere in magazzino")
-
+            return False
 
 class LavoratoreSanitario (Persona) :#classe base
 
