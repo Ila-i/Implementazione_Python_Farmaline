@@ -371,9 +371,9 @@ class ProfiloCliente(ProfiloUtente) :
                     ck_op = True
 
                 elif scelta_ind== "2":
-                    print("L'ordine potrà essere ritirato entro 10 giorni presso la nostra sede fisica in Via Univeristà di Santa Marta, 26")
+                    print("L'ordine potrà essere ritirato entro 10 giorni presso la nostra sede fisica in Via Università di Santa Marta, 26")
 
-                    self.pagare("Via Univeristà di Santa Marta, 26")
+                    self.pagare("Via Università di Santa Marta, 26")
                     ck_op = True
 
                 else:
@@ -521,7 +521,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
             scelta_op: str
 
-            print("Diditare 1 se si vuole aggiornare le quantità dei farmaci sopra elencati")
+            print("Digitare 1 se si vuole aggiornare le quantità dei farmaci sopra elencati")
             print("Digiatre exit per terminare le operazioni")
             scelta_op = input()
 
