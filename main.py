@@ -76,8 +76,6 @@ if isinstance( profilo , ProfiloUtente) :
 
         while not ck_f :
 
-            ck_op: bool = False  # abbreviazione per check_opzioni
-
             print("Digitare 1 se si desidera aggiornare la quantità di scorte in magazzino")
             print("Digitare 2 se si desidera aggiungere nuovi farmaci al magazzino")
             print("Digitare 3 per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna")
@@ -94,7 +92,7 @@ if isinstance( profilo , ProfiloUtente) :
                 profilo.aggiunta_farmaci()
 
             #sezione per confermare l'avvenuta consegna degli ordini arrivati alla farmacia
-            elif opzioni_f == "3" and not ck_op:
+            elif opzioni_f == "3" :
                 print("PROCEDURA DI VERIFICA")
                 profilo.verifica_ordine()
 
