@@ -500,6 +500,8 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
     @staticmethod
     def aggiorna_magazzino() -> None:
 
+        """Consente di aggiornare le quantità dei prodotti che stanno per terminare o sono già terminati"""
+
         controllo_scelta: bool = False
 
         # sezione di codice per cercare nel database se ci sono farmaci che stanno per terminare
@@ -520,7 +522,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
             scelta_op: str
 
             print("Diditare 1 se si vuole aggiornare le quantità dei farmaci sopra elencati")
-            print("Digiatre exit per procedere con altre operazioni")
+            print("Digiatre exit per terminare le operazioni")
             scelta_op = input()
 
             while scelta_op == "1":
@@ -557,7 +559,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
                         return None
 
                     print("Digitare 1 se si desidera continuare ad aggiornare le quantità")
-                    print("Digitare exit per procedere con altre operazioni")
+                    print("Digitare exit per terminare le operazioni")
                     scelta_op = input()
 
                     if scelta_op == 'exit' :

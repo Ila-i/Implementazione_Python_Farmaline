@@ -58,13 +58,11 @@ if isinstance( profilo , ProfiloUtente) :
 
         # sezione per ricerca e acquisto farmaci
         if check_tessera :
-
             while opzioni_c == "1":
                 profilo.search_bar()
                 print("Digitare 1 se si desidera continuare a ricercare medicinali da acquistare ")
                 print("Digitare 2 se si desidera terminare la ricerca e procedere all'acquisto ")
                 opzioni_c = input()
-
 
             if opzioni_c == "2":
                 print("PROCEDURA DI ACQUISTO")
@@ -80,41 +78,27 @@ if isinstance( profilo , ProfiloUtente) :
 
             ck_op: bool = False  # abbreviazione per check_opzioni
 
-            print("Digitare 1 se si desidera aggiornare il magazzino")
-            print("Digitare 2 per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna")
+            print("Digitare 1 se si desidera aggiornare la quantità di scorte in magazzino")
+            print("Digitare 2 se si desidera aggiungere nuovi farmaci al magazzino")
+            print("Digitare 3 per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna")
             print("Digitare exit per terminare le operazioni")
             opzioni_f = input()
 
-            #sezione per applicare modifiche al magazzino
+            # sezione per aggiornare la quantità di farmaci in magazzino
             if opzioni_f == "1":
-                # sezione per aggiornare la quantità di farmaci in magazzino
                 profilo.aggiorna_magazzino()
-                print("Digitare 1 se si desidera aggiungere nuovi farmaci al magazzino")
-                print("Digitare exit per terminare le operazioni")
-                opzioni_f = input()
-
-                if opzioni_f == "2":
-                    ck_op = True
 
             # sezione per aggiungere nuovi farmaci in magazzino
-            while opzioni_f == "1":
+            elif opzioni_f == "2":
                 print("PROCEDURA DI AGGIUNTA FARMACI")
                 profilo.aggiunta_farmaci()
-                print("Digitare 1 se si desidera continuare a aggiungere nuovi farmaci al magazzino")
-                print("Digitare 2 per verificare l'esistenza dell'ordine e confermare l'avvenuta consegna")
-                print("Digitare exit per terminare le operazioni")
-                opzioni_f = input()
 
             #sezione per confermare l'avvenuta consegna degli ordini arrivati alla farmacia
-            while opzioni_f == "2" and not ck_op:
+            elif opzioni_f == "3" and not ck_op:
                 print("PROCEDURA DI VERIFICA")
                 profilo.verifica_ordine()
-                print("Digitare 1 se si desidera aggiungere nuovi farmaci al magazzino")
-                print("Digitare 2 per verificare l'esistenza di un altro ordine e confermare l'avvenuta consegna")
-                print("Digitare exit per terminare le operazioni")
-                opzioni_f = input()
 
-            if opzioni_f == "exit" :
+            elif opzioni_f == "exit" :
                 ck_f = True
             else:
                 print("Operazione inesistente")
