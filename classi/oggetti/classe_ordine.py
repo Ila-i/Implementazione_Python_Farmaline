@@ -88,21 +88,24 @@ class Ordine :
             print(f" quantità : {self.quanto_compro[prodotto["codice_farmaco"]]} ")
             print(f" prezzo : {self.quanto_compro[prodotto["codice_farmaco"]] * float(prodotto["prezzo"]):.2f} €")
 
-    def update_quantity(self, id_utente :str)->None:
+    def update_database(self,ricette_usate:list[str])->None:
 
-        """Agisce sul database andando a modificare le quantità dei faramci in magazzino dopo che il cliente ha effettuato il pagamento"""
+        """Agisce sul database andando ad apportare modifiche alle quantità dei faramci in magazzino e alle ricette usate durante l'acquisto"""
 
+        query: str
+
+        # si modifica la quantità di prodotto in magazzino
         for prodotto in self.carrello:
 
-            query: str
-            # si modifica la quantità di prodotto in magazzino
             new_quantity:int = prodotto["quantità"] - self.quanto_compro[prodotto["codice_farmaco"]]
             query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice_farmaco = '{prodotto["codice_farmaco"]}' "
             connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
             connection.commit()
 
-            # si elimina la ricetta utilizzata nell'acquisto
-            query = f"DELETE FROM Ricetta WHERE codice_farmaco ='{prodotto["codice_farmaco"]}' AND codice_fiscale = '{id_utente}' "
+        # si elimina le ricetta utilizzata nell'acquisto
+        for codice_r in ricette_usate:
+
+            query = f"DELETE FROM Ricetta WHERE codice_ricetta='{codice_r}'"
             connection.execute(text(query))
             connection.commit()
 

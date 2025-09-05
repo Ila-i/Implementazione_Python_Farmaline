@@ -347,24 +347,25 @@ class ProfiloCliente(ProfiloUtente) :
          Altrimenti seleziona automaticamente l'idirizzo della farmacia fisica
          """
 
-        controllo_ricetta: int = Ricetta.verifica_dati_ricetta(self.ordine.carrello, self.ordine.quanto_compro, self.id_utente)
+        ricette_usate: list[str] = Ricetta.verifica_dati_ricetta(self.ordine.carrello, self.ordine.quanto_compro, self.id_utente)
 
-        if len(self.ordine.carrello) > 0 :
+        if len(self.ordine.carrello) > 0 : # il carrello non è vuoto
 
             ck_op :bool = False
-            scelta_ind: str = "exit"
+            scelta_ind: str
+            indirizzo_farmacia : str = "Via Università di Santa Marta, 26"
 
             while not ck_op:
 
                 # non ci sono farmaci con ricetta nel carrello, si può selezionare l'indirizzo di consegna
-                if controllo_ricetta == 0:
+                if not ricette_usate :
 
                     print("Digitare 1 per ricevere l'ordine a domicilio ")
                     print("Digitare 2 per ritirare l'ordine nella farmacia fisica")
                     scelta_ind = input()
 
                 # ci sono farmaci con ricetta nel carrello, non si può selezionare l'indirizzo di consegna
-                elif controllo_ricetta > 0:
+                else :
                     scelta_ind= "2"
 
                 if scelta_ind == "1":
@@ -373,13 +374,13 @@ class ProfiloCliente(ProfiloUtente) :
                     indirizzo_domicilio = input("Inserire l'indirizzo di domicilio a cui si vuole ricevere l'ordine : ")
                     print(f"L'ordine sarà spedito presso {indirizzo_domicilio}")
 
-                    self.pagare(indirizzo_domicilio)
+                    self.pagare(indirizzo_domicilio, ricette_usate)
                     ck_op = True
 
                 elif scelta_ind== "2":
-                    print("L'ordine potrà essere ritirato entro 10 giorni presso la nostra sede fisica in Via Università di Santa Marta, 26")
+                    print(f"L'ordine potrà essere ritirato entro 10 giorni presso la nostra sede fisica in {indirizzo_farmacia}")
 
-                    self.pagare("Via Università di Santa Marta, 26")
+                    self.pagare(indirizzo_farmacia, ricette_usate)
                     ck_op = True
 
                 else:
@@ -387,7 +388,7 @@ class ProfiloCliente(ProfiloUtente) :
         else : # le operazioni vengono terminate se il carrello risulta vuoto
             print("il carrello è vuoto , l'operazione di acquisto verrà terminata")
 
-    def pagare(self, indirizzo: str) -> None:
+    def pagare(self, indirizzo: str, ricette_usate:list[str] ) -> None:
 
         """Permette di selezionare il metodo di pagamento con carta o con portafoglio digitale"""
 
@@ -448,14 +449,14 @@ class ProfiloCliente(ProfiloUtente) :
                 else:
                     print("Operazione andata a buon fine")
                     self.ordine.aggiungi_ordine_a_db(indirizzo, self.id_utente)
-                    self.ordine.update_database(self.id_utente)
+                    self.ordine.update_database(ricette_usate)
                     print(f"Fornire il seguente codice al momento del ritiro : {self.ordine.codice_ordine}")
 
             #pagamento con portafoglio digitale
             elif metodo == "2":
                 print("Operazione andata a buon fine")
                 self.ordine.aggiungi_ordine_a_db(indirizzo, self.id_utente)
-                self.ordine.update_database(self.id_utente)
+                self.ordine.update_database(ricette_usate)
                 print(f"Fornire il seguente codice al momento del ritiro : {self.ordine.codice_ordine}")
 
             else :
@@ -547,7 +548,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
         if not riordinare.empty:
             print("ATTENZIONE!! I seguenti farmaci stanno per terminare o sono già terminati ")
 
-            for farmaco in riordinare.to_dict(orient="records"): # trasforma il Dataframe in una lista di dizionari
+            for farmaco in riordinare.to_dict(orient="records"):
                 print(farmaco)
         else:
             print("Non ci sono prodotti che stanno per terminare o sono già terminati")
@@ -590,7 +591,7 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
                     if not new_elenco.empty:
                         print("ELENCO AGGIORNATO")
-                        for farmaco in new_elenco.to_dict(orient="records"):# trasforma il Dataframe in una lista di dizionari
+                        for farmaco in new_elenco.to_dict(orient="records"):
                             print(farmaco)
                     else:
                         return None
@@ -652,7 +653,7 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
 
             ck_cod: bool = False# abbreviazione per check codice
 
-            for farmaco in elenco.to_dict(orient="records"):# si trasforma il DataFrame in una lista di dizionari
+            for farmaco in elenco.to_dict(orient="records"):
                 print(farmaco)
 
             while not ck_cod:

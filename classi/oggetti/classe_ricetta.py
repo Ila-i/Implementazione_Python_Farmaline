@@ -1,5 +1,6 @@
+from pandas import DataFrame
+
 from funzioni_generali.random_function import create_random_string
-from sqlalchemy import text
 from db import connection
 import pandas as pd
 import string
@@ -22,84 +23,81 @@ class Ricetta :
         self.matricola_medico = matricola
 
     @classmethod
-    def verifica_dati_ricetta( cls, carrello : list[dict], quantity: dict, cod_fisc :str) -> int:
+    def verifica_dati_ricetta( cls, carrello : list[dict], quantity: dict, cod_fisc :str) -> list[str]:
 
-        count: int = 0
+        ricette_usate : list[str] = []
 
         # si ricerca tra i prodotti nel carrello quelli che necessitano di ricetta
         for prodotto in carrello:
 
+            codice_farma: str
             nome_farma: str
 
-            codice_val = prodotto["codice_farmaco"]
+            codice_farma = prodotto["codice_farmaco"]
             nome_farma = prodotto["nome"]
-            query = f" SELECT serve_ricetta FROM FarmaciMagazzino WHERE codice_farmaco = '{codice_val}' AND serve_ricetta = 'si'"
-            serve_ricetta = pd.read_sql_query(query, connection)  # può restituire la stringa "si" o rimanere vuoto
+
+            query:str = f" SELECT serve_ricetta FROM FarmaciMagazzino WHERE codice_farmaco = '{codice_farma}' AND serve_ricetta = 'si'"
+            serve_ricetta: DataFrame = pd.read_sql_query(query, connection)
 
             # sezione dedicata al caso in cui il cliente sta acquistando farmaci che richiedono ricetta
             if not serve_ricetta.empty:
 
                 # controllo se l'utente è in possesso della ricetta per acquistare il farmaco
-                query = f" SELECT codice_ricetta FROM Ricetta WHERE codice_farmaco ='{codice_val}' AND codice_fiscale = '{cod_fisc}'"
-                ricetta_ck = pd.read_sql_query(query, connection)
+                query = f" SELECT codice_ricetta FROM Ricetta WHERE codice_farmaco ='{codice_farma}' AND codice_fiscale = '{cod_fisc}'"
+                ricetta_ck:DataFrame = pd.read_sql_query(query, connection)
 
-                if ricetta_ck.empty: # il cliente non ha ricette associate per quel farmaco
-
+                # il cliente non ha ricette associate per quel farmaco, si elimina il prodotto dal carrello
+                if ricetta_ck.empty:
                     print(f"Non è associata nessuna ricetta per {nome_farma} al profilo corrente, il prodotto con ricetta verrà eliminato dal carrello")
                     carrello.remove(prodotto)
-                    del quantity[codice_val]#codice_val è la chiave del dizionario quantity
+                    del quantity[codice_farma]
 
-                else: #il cliente ha ricette associate per quel farmaco
+                # il cliente ha ricette associate per quel farmaco
+                else:
 
-                    # il numero di ricette è insufficiente per l'acquisto
-                    if quantity[codice_val] > len(ricetta_ck):
-                        print(f"La quantità di farmaco richiesta non corrisponde al numero di ricette ('{len(ricetta_ck)}') relative a quel farmaco, il prodotto verrà eliminato")
+                    # il numero di ricette è inferiore alla quantità di farmaco che si vuole acquistare, si elimina il prodotto dal carrello
+                    if quantity[codice_farma] > len(ricetta_ck):
+                        print(f"La quantità di farmaco richiesta non corrisponde al numero di ricette ('{len(ricetta_ck)}') relative a {nome_farma}, il prodotto verrà tolto dal carrello")
                         carrello.remove(prodotto)
-                        del quantity[codice_val]
+                        del quantity[codice_farma]
 
-                    # il numero di ricette è superiore a quello necessario per l'acquisto
-                    elif quantity[codice_val] < len(ricetta_ck):
+                    # il numero di ricette è superiore alla quantità di farmaco che si vuole acquistare
+                    elif quantity[codice_farma] < len(ricetta_ck):
 
                         #si stampa l'elenco delle ricette associate profilo con cui si sta effettuando l'acquisto
                         for ricetta in ricetta_ck.to_dict(orient="records"):
                             print(ricetta)
 
                         # si fa scegliere all'utente quali ricette usare
-                        for i in range(quantity[codice_val]):
-
+                        for i in range(quantity[codice_farma]):
                             ck=False
-
                             while not ck:
+                                codice_input:str = input("\nInserire il codice della ricetta che si vuole utilizzare : ")
 
-                                codice_input = input("\nInserire il codice della ricetta che si vuole utilizzare : ")
-
+                                #si controlla che il codice inserito sia presente nell'elenco e non sia già stato selezionato
                                 for ricetta in ricetta_ck.to_dict(orient="records"):
-
-                                    if codice_input == ricetta["codice_ricetta"]:
-                                        query = f"DELETE FROM Ricetta WHERE codice_ricetta = '{codice_input}'"
-                                        connection.execute(text(query))
-                                        connection.commit()
-                                        ck=True
-
-                                        query = f" SELECT codice_ricetta FROM Ricetta WHERE codice_farmaco ='{codice_val}' AND codice_fiscale = '{cod_fisc}'"
-                                        ricetta_ck = pd.read_sql_query(query, connection)
-                                        break
+                                    if codice_input == ricetta["codice_ricetta"] :
+                                        if ricette_usate:
+                                            for ri_usate in ricette_usate:
+                                                if codice_input != ri_usate:
+                                                    ricette_usate.append(codice_input)
+                                                    ck=True
+                                                    break
+                                        else :# se è la prima ricetta che viene inserita il controllo si fa solo sull' elenco di ricette
+                                            ricette_usate.append(codice_input)
+                                            ck=True
+                                            break
 
                                 if not ck:
                                     print("Il codice inserito non è valido o non è presente tra quelli elencati")
 
-                    elif quantity[codice_val] == len(ricetta_ck): # il numero di ricette è sufficente
+                    # il numero di ricette è pari alla quantità di farmaco che si vuole acquistare
+                    elif quantity[codice_farma] == len(ricetta_ck):
 
-                        for codice in ricetta_ck["codice_ricetta"].tolist():
-                            query =f"DELETE FROM Ricetta WHERE codice_ricetta = '{codice}'"
-                            connection.execute(text(query))
-                            connection.commit()
+                        for codice_r in ricetta_ck["codice_ricetta"].tolist():
+                            ricette_usate.append(codice_r)
 
-
-                    # conta quanti farmaci con ricetta sono presenti nel carrello e si possono acquistare
-                    count += 1
-
-        return count
+        return ricette_usate
 
     def aggiungi_ricetta_a_db(self)->None:
 
