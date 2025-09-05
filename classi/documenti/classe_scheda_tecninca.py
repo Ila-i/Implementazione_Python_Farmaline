@@ -23,6 +23,8 @@ class SchedaTecnica : # scheda tecnica dei farmaci
 
     def aggiungi_scheda_a_db(self, cod :str )->None:
 
+        """:param cod indica il codice del faramco associato alla scheda"""
+
         scheda = pd.DataFrame(
             data=[[
                 cod,

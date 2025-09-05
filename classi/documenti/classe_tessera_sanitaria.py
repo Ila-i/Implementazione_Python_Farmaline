@@ -1,5 +1,6 @@
 from funzioni_generali.controlli_function import controlla_lunghezza, check_se_vuoto, check_scadenza, controlla_si_no
 from datetime import datetime, date
+from pandas import DataFrame
 from sqlalchemy import text
 from db import connection
 import pandas as pd
@@ -47,59 +48,34 @@ class TesseraSanitaria :
 
         self.numero_identificazione_tessera = controlla_lunghezza(" NUMERO IDENTIFICAZIONE TESSERA (es. 12345678901234567890 ): ", 20)# sulla tessera sanitaria fisica sono 20 caratteri alfanumerici
 
-    def aggiungi_tessera_a_db(self)->None:
-
-        new_tessera = pd.DataFrame(
-            columns=[
-                'codice_fiscale',
-                'sesso',
-                'luogo_nascita',
-                'provincia',
-                'data_nascita',
-                'data_scadenza',
-                'numero_identificazione_tessera'
-            ],
-            data = [[
-                self.codice_fiscale,
-                self.sesso,
-                self.luogo_nascita,
-                self.provincia,
-                self.data_nascita,
-                self.data_scadenza,
-                self.numero_identificazione_tessera
-            ]]
-        )
-        new_tessera.to_sql('TesseraSanitaria', connection, if_exists='append', index=False)
-        connection.commit()
-
     @classmethod
     def check_se_ancora_valida(cls, codice_f: str )->bool:
 
         """Controlla se la tessera sanitaria dell'utente è ancora valida o se invece è scaduta
 
+        :param codice_f si riferisce al codice fiscale del cliente
+
         Restiuisce False se non viene aggiornata la data di scadenza della tessera
         Restituisce True altrimenti
         """
 
-        new_date : datetime.date = date.today()
-
-        query = f"SELECT data_scadenza FROM TesseraSanitaria WHERE codice_fiscale= '{codice_f}'"
-        data = pd.read_sql_query(query, connection)
-        data_ck = data.iloc[0, 0]
-        data_ck = datetime.strptime(data_ck, "%Y-%m-%d").date()
-        data_ck = check_scadenza(data_ck)
+        query:str = f"SELECT data_scadenza FROM TesseraSanitaria WHERE codice_fiscale= '{codice_f}'"
+        data_s: DataFrame= pd.read_sql_query(query, connection)
+        data:str = data_s.iloc[0, 0]
+        data_scadenza:datetime.date= datetime.strptime(data, "%Y-%m-%d").date()
+        data_ck: bool = check_scadenza(data_scadenza)
 
         while not data_ck:
 
-            verifica = controlla_si_no("La tessera sanitaria risulta scaduta. Vuoi aggiornare la data di scadenza ? (Digitare si o no) ")
+            new_date: datetime.date = date.today()
+            verifica:str = controlla_si_no("La tessera sanitaria risulta scaduta. Vuoi aggiornare la data di scadenza ? (Digitare si o no) ")
 
             if verifica == "si":
-
                 ck : bool = False
 
                 #controlla che la data di scadenza inserita sia un valore valido
                 while not ck:
-                    data_input = controlla_lunghezza("NUOVA DATA DI SCADENZA (gg/mm/aaaa) : ", 10)
+                    data_input:str = controlla_lunghezza("NUOVA DATA DI SCADENZA (gg/mm/aaaa) : ", 10)
                     try:
                         new_date = datetime.strptime(data_input, "%d/%m/%Y").date()
                         ck = True
@@ -123,3 +99,28 @@ class TesseraSanitaria :
             data_ck = check_scadenza(new_date)
 
         return True
+
+    def aggiungi_tessera_a_db(self) -> None:
+
+        new_tessera = pd.DataFrame(
+            columns=[
+                'codice_fiscale',
+                'sesso',
+                'luogo_nascita',
+                'provincia',
+                'data_nascita',
+                'data_scadenza',
+                'numero_identificazione_tessera'
+            ],
+            data=[[
+                self.codice_fiscale,
+                self.sesso,
+                self.luogo_nascita,
+                self.provincia,
+                self.data_nascita,
+                self.data_scadenza,
+                self.numero_identificazione_tessera
+            ]]
+        )
+        new_tessera.to_sql('TesseraSanitaria', connection, if_exists='append', index=False)
+        connection.commit()

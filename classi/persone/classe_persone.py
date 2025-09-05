@@ -149,10 +149,6 @@ class ProfiloUtente(ABC):
 
         return username
 
-    @abstractmethod
-    def aggiunta_profilo_utente_a_db(self) -> None:
-        ...
-
     def controllo_nome_utente(self) -> bool:
 
         """Verifica che il nome utente inserito per la registrazione non sia già in uso
@@ -173,7 +169,9 @@ class ProfiloUtente(ABC):
     @classmethod
     def get_profilo(cls, username :str ) -> "ProfiloUtente": #"ProfiloUtente" usato per indicare che il metodo può restiture un oggetto della classe senza che venga istanziata
 
-        """Restituisce il ProfiloUtente con cui si fa l'accesso se l'operazione si è conclusa correttamente
+        """:param username contiene il nome utente del profilo utente che si vuole recuperare
+
+        Restituisce il ProfiloUtente con cui si fa l'accesso se l'operazione si è conclusa correttamente
         Restituisce None altrimenti
         """
 
@@ -210,6 +208,10 @@ class ProfiloUtente(ABC):
         else:
             print("Operazione fallita")
             pass
+
+    @abstractmethod
+    def aggiunta_profilo_utente_a_db(self) -> None:
+        ...
 
 
 class ProfilolavoratoreSanitario(ProfiloUtente) :
@@ -390,7 +392,11 @@ class ProfiloCliente(ProfiloUtente) :
 
     def pagare(self, indirizzo: str, ricette_usate:list[str] ) -> None:
 
-        """Permette di selezionare il metodo di pagamento con carta o con portafoglio digitale"""
+        """Permette di selezionare il metodo di pagamento con carta o con portafoglio digitale
+
+        :param indirizzo contiene l'idirizzo di consegna dell'ordine
+        :param ricette_usate contiene l'elenco dei codici delle ricette usate nell'acquisto
+        """
 
         prezzo_tot: float = 0
 
@@ -640,6 +646,8 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
 
         """Permette al medico di prescrivere una ricetta medica
 
+        :param matricola_medico contiene il codice della matricola del medico che sta prescrivendo la ricetta
+
         Ritorna True quando l'operazione si conclude correttamente
         Ritorna False altrimenti
         """
@@ -678,6 +686,7 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
         else:
             print("Non ci sono farmaci con ricetta da poter prescrivere in magazzino")
             return False
+
 
 class LavoratoreSanitario (Persona) :#classe base
 

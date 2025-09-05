@@ -20,7 +20,10 @@ class Ordine :
 
     def aggiungi_a_carrello(self, results: DataFrame ) -> None:
 
-        """Permette di scegliere se aggiungere o meno un prodotto al carrello per poi acquistarlo"""
+        """Permette di scegliere se aggiungere o meno un prodotto al carrello per poi acquistarlo
+
+        :param results contiene l'elenco dei farmaci recuperato dal database
+        """
 
         codice_p : str
         quantity_p :int
@@ -91,7 +94,11 @@ class Ordine :
 
     def update_database(self,ricette_usate:list[str])->None:
 
-        """Agisce sul database andando ad apportare modifiche alle quantità dei farmaci in magazzino e alle ricette usate durante l'acquisto"""
+        """Agisce sul database andando ad apportare modifiche alle quantità dei farmaci in magazzino e alle ricette usate durante l'acquisto
+
+        :param ricette_usate contiene un elenco con i codici delle ricette usate nell'acquisto
+
+        """
 
         query: str
 
@@ -111,6 +118,10 @@ class Ordine :
             connection.commit()
 
     def aggiungi_ordine_a_db(self, indirizzo: str, id_utente :str) -> None:
+
+        """:param indirizzo contiene l'indirizzo di consegna dell'ordine
+        :param id_utente contiene il codice fiscale del cliente che sta effettuando l'acquisto
+        """
 
         new_ordine = pd.DataFrame(
             [[

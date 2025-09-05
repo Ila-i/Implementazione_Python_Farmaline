@@ -48,7 +48,10 @@ class Farmaco :
 
         """Controlla se il codice del faramco è presente o meno nell'elenco trovato durante la ricerca
 
-        Restituisce il codice corretto """
+        :param results contiene l'elenco dei farmaci recuperato dal database
+
+        Restituisce il codice corretto
+        """
 
         codice_input: str = ''
 
