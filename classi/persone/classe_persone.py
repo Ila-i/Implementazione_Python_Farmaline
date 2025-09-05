@@ -1,5 +1,4 @@
-from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla_lunghezza, check_nascita, \
-    controlla_si_no
+from funzioni_generali.controlli_function import check_scadenza, check_se_vuoto, controlla_lunghezza, check_nascita, controlla_si_no
 from classi.documenti.classe_tesserino_professionale import TesserinoProfessionale
 from classi.documenti.classe_tessera_sanitaria import TesseraSanitaria
 from classi.oggetti.classe_farmaco import Farmaco
@@ -8,7 +7,9 @@ from classi.oggetti.classe_ordine import Ordine
 from abc import ABC, abstractmethod
 from datetime import datetime, date
 from dateutil.utils import today
+from typing import Optional
 from sqlalchemy import text
+from pandas import DataFrame
 from db import connection
 import pandas as pd
 
@@ -32,23 +33,27 @@ class Persona (ABC) :
 
         verifica: bool = False
         pearson: Persona
+        controllo_op: Optional[str] #controllo operazione
 
         while not verifica:
 
             print("Digitare 1 se si desidera iscriversi come cliente")
             print("Digitare 2 se si desidera iscriversi come farmacista")
             print("Digitare 3 se si desidera iscriversi come medico")
-            controllo = input()
+            controllo_op= input()
 
-            if controllo == '1':
+            #registrazione cliente
+            if controllo_op == '1':
                 pearson = Cliente()
                 return pearson.iscriversi()
 
-            elif controllo == '2':
+            #registrazione farmacista
+            elif controllo_op == '2':
                 pearson = LavoratoreSanitario("farmacista")
                 return pearson.iscriversi()
 
-            elif controllo == '3':
+            #registrazione medico
+            elif controllo_op == '3':
                 pearson = LavoratoreSanitario("medico")
                 return pearson.iscriversi()
 
@@ -57,10 +62,13 @@ class Persona (ABC) :
 
     @abstractmethod
     def iscriversi(self) -> bool:
+        """Restituisce True se le operazioni sono andate a buon fine
+        Restituisce False altrimenti"""
         ...
 
     @abstractmethod
-    def crea_profilo(self) ->bool:
+    def crea_profilo(self) ->None:
+        """Genera un profilo utente che viene aggiunto al database della farmacia """
         ...
 
     @abstractmethod
@@ -89,18 +97,18 @@ class ProfiloUtente(ABC):
         """
         username: str
         tentativi: int = 3
+        query : str
 
         print("INSERIMENTO DATI PER ACCESSO")
 
         # sezione dedicata al controllo del nome utente, si verifica se è presente nel database
         username = check_se_vuoto("Inserire il proprio nome utente : ")
         query = f"SELECT nome_utente, password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
-        profile_check = pd.read_sql(query, connection)
+        profile_check : DataFrame = pd.read_sql(query, connection)
 
         while profile_check.empty:
 
-            username = check_se_vuoto(
-                f" Il nome utente inserito non appartiente a un utente registrato, riprovare (tentativi rimasti {tentativi}): ")
+            username = check_se_vuoto(f" Il nome utente inserito non appartiente a un utente registrato, riprovare (tentativi rimasti {tentativi}): ")
             query = f"SELECT nome_utente, password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
             profile_check = pd.read_sql(query, connection)
             tentativi -= 1
@@ -108,6 +116,7 @@ class ProfiloUtente(ABC):
             if tentativi == 0:
                 ck_op : bool = False
                 op: str  # abbreviazione per operazione
+
                 while not ck_op :
                     print("Digitare 2 per iscriversi al servizio se non si è in possesso di un profilo utente già registrato")
                     print("Digitare exit se si vuole terminare le operazioni")
@@ -146,12 +155,16 @@ class ProfiloUtente(ABC):
 
     def controllo_nome_utente(self) -> bool:
 
-        """Verifica che il nome utente inserito per la registrazione non sia già in uso"""
+        """Verifica che il nome utente inserito per la registrazione non sia già in uso
 
-        query = f"SELECT * FROM ProfiloUtente WHERE nome_utente = '{self.nome_utente}'"
-        profilo_esistente = pd.read_sql(query, connection)
+        Ritorna False quando il nome utente  è già in uso
+        Ritorna True altrimenti
+        """
 
-        if not profilo_esistente.empty:  # pd.read_sql(...) restituisce sempre un DataFrame di pandas.
+        query: str  = f"SELECT * FROM ProfiloUtente WHERE nome_utente = '{self.nome_utente}'"
+        profilo_esistente: DataFrame = pd.read_sql(query, connection)
+
+        if not profilo_esistente.empty:
             print(f"Il nome utente '{self.nome_utente}' è già in uso. Scegliere un altro nome.")
             return False
         else:
@@ -161,16 +174,18 @@ class ProfiloUtente(ABC):
     def get_profilo(cls, username :str ) -> "ProfiloUtente": #"ProfiloUtente" usato per indicare che il metodo può restiture un oggetto della classe senza che venga istanziata
 
         """Restituisce il ProfiloUtente con cui si fa l'accesso se l'operazione si è conclusa correttamente
-        Restituisce None altrimenti"""
+        Restituisce None altrimenti
+        """
 
-        query = f"SELECT password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
-        profile = pd.read_sql_query(query, connection)
+        query:str = f"SELECT password, tipo_profilo FROM ProfiloUtente WHERE nome_utente = '{username}'"
+        profile : DataFrame = pd.read_sql_query(query, connection)
 
-        pw = str(profile.iloc[0, 0])
-        tipo_prof = str(profile.iloc[0, 1])
+        pw: str = str(profile.iloc[0, 0])
+        tipo_prof: str = str(profile.iloc[0, 1])
 
         if tipo_prof == "cliente":
 
+            d_c: Optional[DataFrame, str]
             query = f"SELECT id_cliente FROM ProfiloUtente WHERE nome_utente = '{username}'"
             id_c = pd.read_sql_query(query, connection)
             id_c = str(id_c.iloc[0, 0])
@@ -178,6 +193,7 @@ class ProfiloUtente(ABC):
 
         elif tipo_prof == "farmacista":
 
+            id_f: Optional[DataFrame, str]
             query = f"SELECT id_sanitari FROM ProfiloUtente WHERE nome_utente = '{username}'"
             id_f = pd.read_sql_query(query, connection)
             id_f = str(id_f.iloc[0, 0])
@@ -185,6 +201,7 @@ class ProfiloUtente(ABC):
 
         elif tipo_prof == "medico":
 
+            id_m: Optional[DataFrame, str]
             query = f"SELECT id_sanitari FROM ProfiloUtente WHERE nome_utente = '{username}'"
             id_m = pd.read_sql_query(query, connection)
             id_m = str(id_m.iloc[0, 0])
@@ -226,30 +243,13 @@ class ProfiloCliente(ProfiloUtente) :
         super().__init__(nome,password,id_u,tipo_p)
         self.ordine=Ordine()
 
-    def aggiunta_profilo_utente_a_db(self) -> None:
+    def ricerca(self) -> None:
 
-        new_profile = pd.DataFrame(
-            columns=[
-                'nome_utente',
-                'password',
-                'tipo_profilo',
-                'id_cliente'
-            ],
-            data=[[
-                self.nome_utente,
-                self.password,
-                self.tipo_profilo,
-                self.id_utente
-            ]]
-        )
-        new_profile.to_sql('ProfiloUtente', connection, if_exists='append', index=False)
-        connection.commit()
-
-        print("Profilo utente aggiunto con successo.")
-
-    def search_bar(self) -> None:
+        """Permette di effettuare una ricerca di faramci nel magazzino tramite una barra di ricerca o tramite l'uso di filtri"""
 
         scelta_filtri: str
+        query: str
+        results: DataFrame #risultati che si ottengono dalla query
 
         print("BARRA DI RICERCA")
         scelta_filtri = controlla_si_no("Vuoi applicare dei filtri alla tua ricerca? (digitare si o no) : ")
@@ -257,9 +257,9 @@ class ProfiloCliente(ProfiloUtente) :
         if scelta_filtri == "si":
 
             print("Indica almeno uno dei seguenti filtri, quando non si vuole mettere un filtro premere semplicemente invio")
-            indicazioni_terapeutiche = input("Inserire la patologia da trattare : ")
-            composizione = input("Indicare il principio attivo del farmaco : ")
-            posologia = input("Indicare se si sta cercando farmaci per adulti, adolescenti o bambini: ")
+            indicazioni_terapeutiche : str = input("Inserire la patologia da trattare : ")
+            composizione : str = input("Indicare il principio attivo del farmaco : ")
+            posologia : str= input("Indicare se si sta cercando farmaci per adulti, adolescenti o bambini: ")
 
             filters: list[str] = []
 
@@ -272,7 +272,7 @@ class ProfiloCliente(ProfiloUtente) :
             if posologia:
                 filters.append(f"LOWER (s.posologia) LIKE LOWER ('%{posologia}%')")
 
-            query = """
+            query= """
                     SELECT 
                         f.codice_farmaco, 
                         f.nome,
@@ -343,6 +343,10 @@ class ProfiloCliente(ProfiloUtente) :
 
     def scelta_indirizzi(self) -> None:
 
+        """Permette di selezionare l'indirizzo di consegna se non ci sono farmaci con ricetta nel carrello
+         Altrimenti seleziona automaticamente l'idirizzo della farmacia fisica
+         """
+
         controllo_ricetta: int = Ricetta.verifica_dati_ricetta(self.ordine.carrello, self.ordine.quanto_compro, self.id_utente)
 
         if len(self.ordine.carrello) > 0 :
@@ -352,12 +356,14 @@ class ProfiloCliente(ProfiloUtente) :
 
             while not ck_op:
 
+                # non ci sono farmaci con ricetta nel carrello, si può selezionare l'indirizzo di consegna
                 if controllo_ricetta == 0:
 
                     print("Digitare 1 per ricevere l'ordine a domicilio ")
                     print("Digitare 2 per ritirare l'ordine nella farmacia fisica")
                     scelta_ind = input()
 
+                # ci sono farmaci con ricetta nel carrello, non si può selezionare l'indirizzo di consegna
                 elif controllo_ricetta > 0:
                     scelta_ind= "2"
 
@@ -378,10 +384,12 @@ class ProfiloCliente(ProfiloUtente) :
 
                 else:
                     print("operazione non valida, riprovare ")
-        else :
+        else : # le operazioni vengono terminate se il carrello risulta vuoto
             print("il carrello è vuoto , l'operazione di acquisto verrà terminata")
 
     def pagare(self, indirizzo: str) -> None:
+
+        """Permette di selezionare il metodo di pagamento con carta o con portafoglio digitale"""
 
         prezzo_tot: float = 0
 
@@ -405,6 +413,7 @@ class ProfiloCliente(ProfiloUtente) :
             print("Digitare 2 per pagare con portafoglio digitale (paypal , Google pay, Apple pay)")
             metodo = input()
 
+            #pagamento con carta
             if metodo == "1":
 
                 ck_data: bool = False
@@ -442,6 +451,7 @@ class ProfiloCliente(ProfiloUtente) :
                     self.ordine.update_quantity(self.id_utente)
                     print(f"Fornire il seguente codice al momento del ritiro : {self.ordine.codice_ordine}")
 
+            #pagamento con portafoglio digitale
             elif metodo == "2":
                 print("Operazione andata a buon fine")
                 self.ordine.aggiungi_ordine_a_db(indirizzo, self.id_utente)
@@ -456,26 +466,52 @@ class ProfiloCliente(ProfiloUtente) :
         else:
             print("Opzione non valida")
 
+    def aggiunta_profilo_utente_a_db(self) -> None:
+
+        new_profile = pd.DataFrame(
+            columns=[
+                'nome_utente',
+                'password',
+                'tipo_profilo',
+                'id_cliente'
+            ],
+            data=[[
+                self.nome_utente,
+                self.password,
+                self.tipo_profilo,
+                self.id_utente
+            ]]
+        )
+        new_profile.to_sql('ProfiloUtente', connection, if_exists='append', index=False)
+        connection.commit()
+
+        print("Profilo utente aggiunto con successo.")
+
 class ProfiloFarmacista(ProfilolavoratoreSanitario) :
 
     @staticmethod
     def verifica_ordine() -> None:
 
+        """Consente al farmacista di verificare che l'ordine del cliente sia all'interno del database
+         In caso positivo l'ordine viene eliminato dal database
+         Altrimenti mostra un messaggio di 'operazione fallita'
+         """
+
         cod_fisc: str
         n_ordine: str
-        count: int = 3
+        count: int = 3 # per contare il numero di tentativi di inserimento dei dati richiesti
 
         print("RICERCA ORDINE NEL DATABASE")
 
         cod_fisc = controlla_lunghezza("Inserire il codice fiscale del cliente( es. RSSMRA00A01H501C ) : ", 16 )
         n_ordine = check_se_vuoto("Inserire il numero dell'ordine : ")
 
-        query = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Università di Santa Marta, 26' "
-        trovato = pd.read_sql(query, connection)
+        query:str = f"SELECT * FROM Ordine WHERE numero_ordine = '{n_ordine}' AND codice_fiscale = '{cod_fisc}' AND indirizzo_consegna = 'Via Università di Santa Marta, 26' "
+        trovato: DataFrame = pd.read_sql(query, connection) # rimane vuoto se non si trova l'ordine nel database
 
         while trovato.empty:
 
-            print(f"Ordine non trovato, riprovare (tentativi rimasti {count}")
+            print(f"Ordine non trovato, riprovare (tentativi rimasti {count})")
             cod_fisc = controlla_lunghezza("Inserire il codice fiscale del cliente ( es. RSSMRA00A01H501C )  : ", 16)
             n_ordine = check_se_vuoto("Inserire il numero dell'ordine : ")
 
@@ -579,6 +615,8 @@ class ProfiloFarmacista(ProfilolavoratoreSanitario) :
     @staticmethod
     def aggiunta_farmaci() -> None:
 
+        """Consente al faramcista di aggiungere nuove tipologie di farmaci in magazzino """
+
         print("Per aggiungere una nuova tipologia di medicinale in magazzino, seguire le istruzioni di seguito riportate ")
 
         query = "SELECT MAX(CAST(codice_farmaco AS INT)) FROM SchedaTecnica"
@@ -597,6 +635,12 @@ class ProfiloMedico(ProfilolavoratoreSanitario) :
 
     @staticmethod
     def crea_ricetta(matricola_medico :str) -> bool:
+
+        """Permette al medico di prescrivere una ricetta medica
+
+        Ritorna True quando l'operazione si conclude correttamente
+        Ritorna False altrimenti
+        """
 
         print("Digitare il codice del farmaco che si vuole prescrivere, selezionando dal segunete elenco ")
 
@@ -671,9 +715,10 @@ class LavoratoreSanitario (Persona) :#classe base
         else:
             self.aggiungi_persona_a_db()
             # sezione per associazione profilo utente
-            return self.crea_profilo()
+            self.crea_profilo()
+            return True
 
-    def crea_profilo(self) ->bool:
+    def crea_profilo(self) ->None:
 
         print("CREAZIONE PROFILO UTENTE")
         nome = check_se_vuoto(" Inserire un nome utente : ")
@@ -692,7 +737,6 @@ class LavoratoreSanitario (Persona) :#classe base
 
         print("registrazione effettuata con successo.")
         print(f"        Benvenuto {profilo.nome_utente} !")
-        return True
 
     def aggiungi_persona_a_db(self)-> None:
 
@@ -751,16 +795,18 @@ class Cliente(Persona):
 
             else:
                 self.aggiungi_persona_a_db()
-                return self.crea_profilo()
+                self.crea_profilo()
+                return True
         else:
             print("La tessera risulta scaduta o la data di nascita non è valida, non è possibile effettuare l'iscrizione al servizio")
             return False
 
-    def crea_profilo(self) ->bool:
+    def crea_profilo(self) ->None:
 
         print("CREAZIONE PROFILO UTENTE")
         nome = check_se_vuoto(" Inserire un nome utente : ")
         password = check_se_vuoto(" Inserire una password : ")
+
         profilo = ProfiloCliente(nome, password, self.t_s.codice_fiscale, 'cliente')
         ck_profilo = profilo.controllo_nome_utente()
 
@@ -773,7 +819,6 @@ class Cliente(Persona):
 
         print("registrazione effettuata con successo.")
         print(f"        Benvenuto {profilo.nome_utente} !")
-        return True
 
     def aggiungi_persona_a_db(self)->None:
 

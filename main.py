@@ -59,7 +59,7 @@ if isinstance( profilo , ProfiloUtente) :
         # sezione per ricerca e acquisto farmaci
         if check_tessera :
             while opzioni_c == "1":
-                profilo.search_bar()
+                profilo.ricerca()
                 print("Digitare 1 se si desidera continuare a ricercare medicinali da acquistare ")
                 print("Digitare 2 se si desidera terminare la ricerca e procedere all'acquisto ")
                 opzioni_c = input()
