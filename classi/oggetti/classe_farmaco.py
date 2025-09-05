@@ -1,7 +1,6 @@
-from pandas import DataFrame
-
-from classi.documenti.classe_scheda_tecninca import SchedaTecnica
 from funzioni_generali.controlli_function import check_se_vuoto, controlla_si_no
+from classi.documenti.classe_scheda_tecninca import SchedaTecnica
+from pandas import DataFrame
 from db import connection
 import pandas as pd
 
@@ -52,7 +51,6 @@ class Farmaco :
         Restituisce il codice corretto """
 
         codice_input: str = ''
-        # sezione dedicata al
 
         if len(results) > 1:  # Se ce più di un farmaco nell'elenco
 
@@ -87,7 +85,7 @@ class Farmaco :
         :param codice_f indica il codice del farmaco selezionato
         :param quanto_in_m indica la quantità di faramco nel magazzino
         :param ck_se_presente indica se il faramco era già stato selezionato
-        :param quanto_in_c indica la quantà di farmaco gia presente nel carrello se precedentemente selezionato
+        :param quanto_in_c indica la quantà di farmaco gia presente nel carrello, se precedentemente selezionato
 
         Restituisce la quantità corretta di farmaco nel caso in cui è presente una quantità sufficiente in magazzino
         Restituisce 0 se il farmaco è terminato"""

@@ -1,6 +1,5 @@
-from pandas import DataFrame
-
 from funzioni_generali.random_function import create_random_string
+from pandas import DataFrame
 from db import connection
 import pandas as pd
 import string
