@@ -51,14 +51,16 @@ class Ricetta :
 
                 else: #il cliente ha ricette associate per quel farmaco
 
-                    if quantity[codice_val] > len(ricetta_ck):# il numero di ricette è insufficiente per l'acquisto
+                    # il numero di ricette è insufficiente per l'acquisto
+                    if quantity[codice_val] > len(ricetta_ck):
                         print(f"La quantità di farmaco richiesta non corrisponde al numero di ricette ('{len(ricetta_ck)}') relative a quel farmaco, il prodotto verrà eliminato")
                         carrello.remove(prodotto)
                         del quantity[codice_val]
 
-                    elif quantity[codice_val] < len(ricetta_ck): # il numero di ricette è superiore a quello necessario per l'acquisto
+                    # il numero di ricette è superiore a quello necessario per l'acquisto
+                    elif quantity[codice_val] < len(ricetta_ck):
 
-                        #se sono state prescritte più ricette si stampa l'elenco di quelle associate
+                        #si stampa l'elenco delle ricette associate profilo con cui si sta effettuando l'acquisto
                         for ricetta in ricetta_ck.to_dict(orient="records"):
                             print(ricetta)
 
@@ -94,7 +96,7 @@ class Ricetta :
                             connection.commit()
 
 
-                    # conta quanti farmaci con ricetta sono presenti nel carrello e si posso acquistare
+                    # conta quanti farmaci con ricetta sono presenti nel carrello e si possono acquistare
                     count += 1
 
         return count

@@ -1,12 +1,10 @@
+from funzioni_generali.controlli_function import controlla_si_no
+from classi.oggetti.classe_farmaco import Farmaco
 from pandas import DataFrame
 from sqlalchemy import text
-
-from classi.oggetti.classe_farmaco import Farmaco
 from db import connection
 import pandas as pd
 import random
-
-from funzioni_generali.controlli_function import controlla_si_no
 
 
 class Ordine :
@@ -22,8 +20,9 @@ class Ordine :
 
     def aggiungi_a_carrello(self, results: DataFrame ) -> None:
 
+        """Permette di scegliere se aggiungere o meno un prodotto al carrello per poi acquistarlo"""
         codice_p : str
-        quantity_p :int=0
+        quantity_p :int
 
         codice_p = Farmaco.controllo_codice_farmaco(results)
 
@@ -44,19 +43,19 @@ class Ordine :
 
         if quantity_p > 0:
 
-            aggiungi_carrello = controlla_si_no("\nDigitare 'si' se si vuole aggiungere il prodotto al carrello, altrimenti digitare 'no': ")
+            aggiungi_carrello:str = controlla_si_no("\nDigitare 'si' se si vuole aggiungere il prodotto al carrello, altrimenti digitare 'no': ")
 
             if aggiungi_carrello == "si":
 
                 # recupera la riga che contiene le informazioni del farmaco che si vuole acquistare
-                riga = results.loc[results["codice_farmaco"] == codice_p]
-                farmaco_dict = riga.iloc[0].to_dict()# prende la prima corrispondenza
+                riga:DataFrame = results.loc[results["codice_farmaco"] == codice_p]
+                farmaco_dict: dict = riga.iloc[0].to_dict()# prende la prima corrispondenza nel Dataframe
 
-                if not ck_se_presente : # aggiunge al  carrello solo se non ho messo nel carrello lo stesso prodotto
+                if not ck_se_presente : # aggiunge al  carrello solo se non si è messo nel carrello lo stesso prodotto
                     self.carrello.append(farmaco_dict)
                     self.quanto_compro[codice_p]= quantity_p
                 else :
-                    self.quanto_compro[codice_p] = quantity_p
+                    self.quanto_compro[codice_p] = quantity_p# aggiorna la quantità di prodotto se già presente nel carrello
 
                 print("Farmaco aggiunto al carrello.")
 
@@ -91,12 +90,13 @@ class Ordine :
 
     def update_quantity(self, id_utente :str)->None:
 
-        """Agisce sul database andando a modificare le quantità di prodotto aggiornate dal farmacista"""
+        """Agisce sul database andando a modificare le quantità dei faramci in magazzino dopo che il cliente ha effettuato il pagamento"""
 
         for prodotto in self.carrello:
 
+            query: str
             # si modifica la quantità di prodotto in magazzino
-            new_quantity = prodotto["quantità"] - self.quanto_compro[prodotto["codice_farmaco"]]
+            new_quantity:int = prodotto["quantità"] - self.quanto_compro[prodotto["codice_farmaco"]]
             query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice_farmaco = '{prodotto["codice_farmaco"]}' "
             connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
             connection.commit()
@@ -108,7 +108,6 @@ class Ordine :
 
     def aggiungi_ordine_a_db(self, indirizzo: str, id_utente :str) -> None:
 
-        # aggiunge il nuovo ordine al database
         new_ordine = pd.DataFrame(
             [[
                 self.codice_ordine,
