@@ -21,6 +21,7 @@ class Ordine :
     def aggiungi_a_carrello(self, results: DataFrame ) -> None:
 
         """Permette di scegliere se aggiungere o meno un prodotto al carrello per poi acquistarlo"""
+
         codice_p : str
         quantity_p :int
 
@@ -90,7 +91,7 @@ class Ordine :
 
     def update_database(self,ricette_usate:list[str])->None:
 
-        """Agisce sul database andando ad apportare modifiche alle quantità dei faramci in magazzino e alle ricette usate durante l'acquisto"""
+        """Agisce sul database andando ad apportare modifiche alle quantità dei farmaci in magazzino e alle ricette usate durante l'acquisto"""
 
         query: str
 
@@ -99,7 +100,7 @@ class Ordine :
 
             new_quantity:int = prodotto["quantità"] - self.quanto_compro[prodotto["codice_farmaco"]]
             query = f"UPDATE FarmaciMagazzino SET quantità = '{new_quantity}' WHERE codice_farmaco = '{prodotto["codice_farmaco"]}' "
-            connection.execute(text(query))  # serve per eseguire query che non devono restituire valori
+            connection.execute(text(query))
             connection.commit()
 
         # si elimina le ricetta utilizzata nell'acquisto

@@ -25,6 +25,15 @@ class Ricetta :
     @classmethod
     def verifica_dati_ricetta( cls, carrello : list[dict], quantity: dict, cod_fisc :str) -> list[str]:
 
+        """Effettua una verifica automatica della presenza nel database delle ricette associate al profilo, relative ai faramci che si sta acquistando
+
+        :param carrello contiene i prodotti che si vogliono acquistare
+        :param quantity contiene le quantità dei prodotti che si vuogliono acquistare, usa come chiave il codice del farmaco
+        :param cod_fisc rappresenta il codice fiscale del cliente che sta effettuando l'acquisto
+
+        Ritorna una lista con i codici delle ricette che vengono utilizzate nell'acquisto
+        Ritorna una lista vuota se non ci sono ricette da usare """
+
         ricette_usate : list[str] = []
 
         # si ricerca tra i prodotti nel carrello quelli che necessitano di ricetta
@@ -39,7 +48,7 @@ class Ricetta :
             query:str = f" SELECT serve_ricetta FROM FarmaciMagazzino WHERE codice_farmaco = '{codice_farma}' AND serve_ricetta = 'si'"
             serve_ricetta: DataFrame = pd.read_sql_query(query, connection)
 
-            # sezione dedicata al caso in cui il cliente sta acquistando farmaci che richiedono ricetta
+            # sezione dedicata al caso in cui il cliente acquista farmaci che richiedono ricetta
             if not serve_ricetta.empty:
 
                 # controllo se l'utente è in possesso della ricetta per acquistare il farmaco
